@@ -1,0 +1,70 @@
+{
+  "_from": "node-blockly",
+  "_id": "node-blockly@1.0.18",
+  "_inBundle": false,
+  "_integrity": "sha1-5I6vUMhx+fzT49HXt0Mw1ltz63Q=",
+  "_location": "/node-blockly",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "node-blockly",
+    "name": "node-blockly",
+    "escapedName": "node-blockly",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/node-blockly/-/node-blockly-1.0.18.tgz",
+  "_shasum": "e48eaf50c871f9fcd3e3d1d7b74330d65b73eb74",
+  "_spec": "node-blockly",
+  "_where": "D:\\Simplex-Angular-Pixi-Test",
+  "author": {
+    "name": "Eugene Formanenko",
+    "email": "mo4islona@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/mo4islona/node-blockly/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "xmldom": "^0.1.22"
+  },
+  "deprecated": false,
+  "description": "Blockly for Node.js and Browser as CommonJS module",
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "gulp": "^3.8.11",
+    "gulp-insert": "^0.4.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.3",
+    "mocha": "^2.2.5",
+    "xmldom": "^0.1.22"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "homepage": "https://github.com/mo4islona/node-blockly",
+  "keywords": [
+    "blockly",
+    "commonjs"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "node-blockly",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mo4islona/node-blockly.git"
+  },
+  "scripts": {
+    "blockly:upgrade": "git submodule init && git submodule update --recursive --remote",
+    "prepublish": "rm -rf lib && mkdir lib && gulp build",
+    "test": "mocha test/*_test.js"
+  },
+  "version": "1.0.18"
+}
