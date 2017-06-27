@@ -2,14 +2,15 @@ import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angula
 
 import * as PIXI from 'pixi.js';
 import * as antlr4 from 'antlr4';
-import * as blockly from 'node-blockly';
 
 @Component({
   selector: 'sapt-root',
   templateUrl: './app.component.html',
   styles: []
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
+  @ViewChild('canvas') editorContent: ElementRef;
+
   private cat: PIXI.Sprite;
 
   public handler() {
@@ -24,61 +25,37 @@ export class AppComponent {
 
     console.log(chars);
 
-    console.log(window['workspace']);
+    // console.log(window['workspace']);
   }
 
-  constructor(private elementRef: ElementRef) {
+  ngAfterViewInit() {
+    const renderer = PIXI.autoDetectRenderer(512, 512);
 
-                    // Create the renderer
-      const renderer = PIXI.autoDetectRenderer(512, 512);
+    const editor = this.editorContent.nativeElement;
+    editor.appendChild(renderer.view);
 
-      const el = this.elementRef.nativeElement;
-      el.appendChild(renderer.view);
+    const stage = new PIXI.Container();
 
-      // Create a container object called the `stage`
-      const stage = new PIXI.Container();
+    PIXI.loader
+      .add('./assets/cat.png')
+      .load(setup);
 
-  // Use Pixi's built-in `loader` object to load an image
-  PIXI.loader
-  .add('./assets/cat.png')
-  .load(setup);
+    const _this = this;
+    function setup() {
+      _this.cat = new PIXI.Sprite(
+        PIXI.loader.resources['./assets/cat.png'].texture
 
-  // This `setup` function will run when the image has loaded
+      );
 
-  const _this = this;
-  function setup() {
+      stage.addChild(_this.cat);
 
-  // Create the `cat` sprite from the texture
-  _this.cat = new PIXI.Sprite(
-      PIXI.loader.resources['./assets/cat.png'].texture
+      function gameLoop() {
+        requestAnimationFrame(gameLoop);
 
-  );
+        renderer.render(stage);
+      }
 
-  stage.addChild(_this.cat);
-
-  function gameLoop() {
-
-    // Loop this function at 60 frames per second
-    requestAnimationFrame(gameLoop);
-
-    // Move the cat 1 pixel to the right each frame
-    // cat.x += 1;
-
-    // Render the stage to see the animation
-    renderer.render(stage);
-  }
-
-  // Start the game loop
-  gameLoop();
-
-    // Add the cat to the stage
-
-
-    // Render the stage
-    // renderer.render(stage);
-  }
-
-        // Tell the `renderer` to `render` the `stage`
-
+      gameLoop();
     }
+  }
 }
