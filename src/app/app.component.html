@@ -1,1 +1,16 @@
-<div #canvas></div> <button (click)="handler()">Klicken</button>
+<div #canvas></div>
+
+<button (click)="handler()">Klicken</button>
+
+<table>
+  <tr>
+    <th>Line</th>
+    <th>Char</th>
+    <th>Msg</th>
+  </tr>
+  <tr *ngFor="let error of errors">
+    <td>{{ error.line }}</td>
+    <td>{{ error.char }}</td>
+    <td>{{ error.msg }}</td>
+  </tr>
+</table>

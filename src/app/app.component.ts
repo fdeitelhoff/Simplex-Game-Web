@@ -1,4 +1,9 @@
+import { SimplexErrorListener } from './simplexErrorListener';
 import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+
+import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
+import { SimplexLexer } from './../simplex/gen/SimplexLexer';
+import { SimplexParser } from './../simplex/gen/SimplexParser';
 
 import * as PIXI from 'pixi.js';
 import * as antlr4 from 'antlr4';
@@ -12,19 +17,31 @@ export class AppComponent implements AfterViewInit {
   @ViewChild('canvas') editorContent: ElementRef;
 
   private cat: PIXI.Sprite;
+  private simplexErrorListener: SimplexErrorListener;
+  private errors: any[];
+
+  constructor() {
+    this.simplexErrorListener = new SimplexErrorListener();
+  }
 
   public handler() {
-    const chars = new antlr4.InputStream('hallo du da');
-    // const lexer = new simplexLexer.SimplexLexer(chars);
-    // const tokens = new antlr4.CommonTokenStream(lexer);
-    // const parser = new simplexParser.SimplexParser(tokens);
-    // parser.buildParseTrees = true;
+    const chars = new ANTLRInputStream('integer i = 3');
+    const lexer = new SimplexLexer(chars);
+    const tokens = new CommonTokenStream(lexer);
+    const parser = new SimplexParser(tokens);
+    parser.buildParseTree = true;
+
+    parser.removeErrorListeners();
+    parser.addErrorListener(this.simplexErrorListener);
+
+    const result = parser.simplex();
 
     this.cat.x += 5;
     this.cat.y += 5;
 
-    console.log(chars);
+    console.log(result);
 
+    this.errors = this.simplexErrorListener.errors;
     // console.log(window['workspace']);
   }
 

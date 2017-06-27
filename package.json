@@ -8,7 +8,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "antlr4ts": "antlr4ts -listener -lib src/simplex/grammar/ src/simplex/grammar/SimplexParser.g4 src/simplex/grammar/SimplexLexer.g4 -o src/simplex/gen/"
   },
   "private": true,
   "dependencies": {
@@ -22,6 +23,8 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
     "antlr4": "^4.7.0",
+    "antlr4ts": "^0.4.1-alpha.0",
+    "antlr4ts-cli": "^0.4.0-alpha.4",
     "core-js": "^2.4.1",
     "monaco-editor": "^0.8.3",
     "node-blockly": "^1.0.18",
