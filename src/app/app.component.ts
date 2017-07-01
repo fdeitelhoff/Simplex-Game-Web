@@ -23,14 +23,35 @@ export class AppComponent implements AfterViewInit {
   private simplexErrorListener: SimplexErrorListener;
   private errors: any[];
   private _dataService: DataService;
+  private _simulation: Function;
 
   constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
     this._dataService = dataService;
+
+    const typeScriptCode = `
+      for (let i = 1; i <= 24; i++) {
+        ev3.x += 1;
+        ev3.y += 1;
+        console.log(i);
+      }
+
+      if (ev3.x > 25 || ev3.y > 25) {
+          throw new RangeError();
+      } else {
+        ev3.x += x;
+        ev3.y += y;
+
+        // console.log(ev3.x + " " + ev3.y);
+      }
+
+      return { 'x': ev3.x };
+    `;
+
+    this._simulation = new Function('ev3', 'x', 'y', typeScriptCode);
   }
 
   public handler() {
-    console.log(this._dataService.simplexCode);
     const chars = new ANTLRInputStream(this._dataService.simplexCode);
     const lexer = new SimplexLexer(chars);
     const tokens = new CommonTokenStream(lexer);
@@ -45,11 +66,19 @@ export class AppComponent implements AfterViewInit {
 
     ParseTreeWalker.DEFAULT.walk(listener, result);
 
-    this.cat.x += 5;
-    this.cat.y += 5;
+    // this.cat.x += 5;
+    // this.cat.y += 5;
 
     this.errors = this.simplexErrorListener.errors;
     // console.log(window['workspace']);
+
+
+    try {
+      const t = this._simulation(this.cat, 5, 10);
+      console.log('test: ' + t.x);
+    } catch (error) {
+      console.log('error in sim: ' + error);
+    }
   }
 
   ngAfterViewInit() {
