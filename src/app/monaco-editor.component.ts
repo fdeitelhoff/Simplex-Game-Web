@@ -1,3 +1,4 @@
+import { DataService } from './data.service';
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 
 declare const monaco: any;
@@ -11,6 +12,13 @@ declare const require: any;
 export class MonacoEditorComponent implements OnInit, AfterViewInit {
 
   @ViewChild('editor') editorContent: ElementRef;
+
+  private editor: any;
+  private _dataService: DataService;
+
+  constructor(private dataService: DataService) {
+    this._dataService = dataService;
+  }
 
   ngOnInit() {
   }
@@ -42,6 +50,7 @@ export class MonacoEditorComponent implements OnInit, AfterViewInit {
 
     monaco.languages.register({ id: 'Simplex' });
 
+    const _this = this;
     monaco.languages.setMonarchTokensProvider('Simplex', {
         // Set defaultToken to invalid to see what you do not tokenize yet
         defaultToken: 'invalid',
@@ -125,10 +134,20 @@ export class MonacoEditorComponent implements OnInit, AfterViewInit {
         },
     });
 
-    const editor = monaco.editor.create(myDiv, {
+    _this.editor = monaco.editor.create(myDiv, {
       value: 'integer i = 3',
       language: 'Simplex',
       automaticLayout: true
+    });
+
+    _this.editor.getModel().onDidChangeContent(function () {
+      _this._dataService.simplexCode = _this.editor.getValue();
+    });
+
+    // Needed for the first parse document call when the editor is loaded with content.
+    const didScrollChangeDisposable = _this.editor.onDidScrollChange(function (event) {
+        didScrollChangeDisposable.dispose();
+        _this.dataService.simplexCode = _this.editor.getValue();
     });
   }
 }

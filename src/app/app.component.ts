@@ -1,12 +1,15 @@
+import { DataService } from './data.service';
+import { SimplexASTListener } from './simplexASTListener';
 import { SimplexErrorListener } from './simplexErrorListener';
 import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
 
 import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
+import { ParseTreeWalker } from 'antlr4ts/tree';
 import { SimplexLexer } from './../simplex/gen/SimplexLexer';
 import { SimplexParser } from './../simplex/gen/SimplexParser';
 
 import * as PIXI from 'pixi.js';
-import * as antlr4 from 'antlr4';
+// import * as antlr4 from 'antlr4';
 
 @Component({
   selector: 'sapt-root',
@@ -19,13 +22,16 @@ export class AppComponent implements AfterViewInit {
   private cat: PIXI.Sprite;
   private simplexErrorListener: SimplexErrorListener;
   private errors: any[];
+  private _dataService: DataService;
 
-  constructor() {
+  constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
+    this._dataService = dataService;
   }
 
   public handler() {
-    const chars = new ANTLRInputStream('integer i = 3');
+    console.log(this._dataService.simplexCode);
+    const chars = new ANTLRInputStream(this._dataService.simplexCode);
     const lexer = new SimplexLexer(chars);
     const tokens = new CommonTokenStream(lexer);
     const parser = new SimplexParser(tokens);
@@ -35,11 +41,12 @@ export class AppComponent implements AfterViewInit {
     parser.addErrorListener(this.simplexErrorListener);
 
     const result = parser.simplex();
+    const listener = new SimplexASTListener();
+
+    ParseTreeWalker.DEFAULT.walk(listener, result);
 
     this.cat.x += 5;
     this.cat.y += 5;
-
-    console.log(result);
 
     this.errors = this.simplexErrorListener.errors;
     // console.log(window['workspace']);
