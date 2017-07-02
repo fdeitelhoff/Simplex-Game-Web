@@ -5,8 +5,10 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 
 export class SimplexASTListener implements SimplexParserListener {
-  constructor() {
+  private simulatorCode: string;
 
+  constructor() {
+    this.simulatorCode = '';
   }
 
   exitSimplex? (ctx: SimplexContext) {
