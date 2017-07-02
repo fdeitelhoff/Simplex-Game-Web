@@ -30,21 +30,23 @@ export class AppComponent implements AfterViewInit {
     this._dataService = dataService;
 
     const typeScriptCode = `
-      for (let i = 1; i <= 24; i++) {
-        ev3.x += 1;
-        ev3.y += 1;
-        console.log(i);
+      if (ev3.x > 25 || ev3.y > 25) {
+        SimulatorError.message = 'I am a test!';
+        throw SimulatorError;
+      } else {
+        for (let i = 1; i <= 24; i++) {
+          ev3.x += 1;
+          ev3.y += 1;
+          console.log(ev3.x);
+        }
       }
 
-      if (ev3.x > 25 || ev3.y > 25) {
-          SimulatorError.message = 'I am a test!';
-          throw SimulatorError;
-      } else {
+      /* else {
         ev3.x += x;
         ev3.y += y;
 
         // console.log(ev3.x + " " + ev3.y);
-      }
+      }*/
 
       return { 'x': ev3.x };
     `;
@@ -76,7 +78,7 @@ export class AppComponent implements AfterViewInit {
 
     try {
       const t = this._simulation(this.cat, 5, 10, new SimulatorError('<No Message Provided!>'));
-      console.log('test: ' + t.x);
+      console.log('Return von X: ' + t.x);
     } catch (error) {
       console.log('error in sim: ' + error);
     }
