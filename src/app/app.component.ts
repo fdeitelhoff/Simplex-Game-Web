@@ -1,3 +1,4 @@
+import { SimulatorError } from './simulatorError';
 import { DataService } from './data.service';
 import { SimplexASTListener } from './simplexASTListener';
 import { SimplexErrorListener } from './simplexErrorListener';
@@ -9,7 +10,6 @@ import { SimplexLexer } from './../simplex/gen/SimplexLexer';
 import { SimplexParser } from './../simplex/gen/SimplexParser';
 
 import * as PIXI from 'pixi.js';
-// import * as antlr4 from 'antlr4';
 
 @Component({
   selector: 'sapt-root',
@@ -37,7 +37,8 @@ export class AppComponent implements AfterViewInit {
       }
 
       if (ev3.x > 25 || ev3.y > 25) {
-          throw new RangeError();
+          SimulatorError.message = 'I am a test!';
+          throw SimulatorError;
       } else {
         ev3.x += x;
         ev3.y += y;
@@ -48,7 +49,7 @@ export class AppComponent implements AfterViewInit {
       return { 'x': ev3.x };
     `;
 
-    this._simulation = new Function('ev3', 'x', 'y', typeScriptCode);
+    this._simulation = new Function('ev3', 'x', 'y', 'SimulatorError', typeScriptCode);
   }
 
   public handler() {
@@ -74,7 +75,7 @@ export class AppComponent implements AfterViewInit {
 
 
     try {
-      const t = this._simulation(this.cat, 5, 10);
+      const t = this._simulation(this.cat, 5, 10, new SimulatorError('<No Message Provided!>'));
       console.log('test: ' + t.x);
     } catch (error) {
       console.log('error in sim: ' + error);
