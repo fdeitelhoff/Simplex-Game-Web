@@ -29,7 +29,7 @@ export class AppComponent implements AfterViewInit {
     this.simplexErrorListener = new SimplexErrorListener();
     this._dataService = dataService;
 
-    const typeScriptCode = `
+    /*const typeScriptCode = `
       if (ev3.x > 25 || ev3.y > 25) {
         SimulatorError.message = 'I am a test!';
         throw SimulatorError;
@@ -46,12 +46,11 @@ export class AppComponent implements AfterViewInit {
         ev3.y += y;
 
         // console.log(ev3.x + " " + ev3.y);
-      }*/
+      }
 
       return { 'x': ev3.x };
     `;
-
-    this._simulation = new Function('ev3', 'x', 'y', 'SimulatorError', typeScriptCode);
+    */
   }
 
   public handler() {
@@ -69,6 +68,8 @@ export class AppComponent implements AfterViewInit {
 
     ParseTreeWalker.DEFAULT.walk(listener, result);
 
+    // console.log(listener.emulationCode);
+
     // this.cat.x += 5;
     // this.cat.y += 5;
 
@@ -77,6 +78,7 @@ export class AppComponent implements AfterViewInit {
 
 
     try {
+      this._simulation = new Function('ev3', 'x', 'y', 'SimulatorError', 'test');
       const t = this._simulation(this.cat, 5, 10, new SimulatorError('<No Message Provided!>'));
       console.log('Return von X: ' + t.x);
     } catch (error) {
