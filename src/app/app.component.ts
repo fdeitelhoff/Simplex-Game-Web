@@ -1,3 +1,5 @@
+import { SimplexASTVisitor } from './simplexASTVisitor';
+import { SimplexParserVisitor } from './../simplex/gen/SimplexParserVisitor';
 import { SimulatorError } from './simulatorError';
 import { DataService } from './data.service';
 import { SimplexASTListener } from './simplexASTListener';
@@ -64,9 +66,11 @@ export class AppComponent implements AfterViewInit {
     parser.addErrorListener(this.simplexErrorListener);
 
     const result = parser.simplex();
-    const listener = new SimplexASTListener();
+    // const listener = new SimplexASTListener();
 
-    ParseTreeWalker.DEFAULT.walk(listener, result);
+    // ParseTreeWalker.DEFAULT.walk(listener, result);
+    const visitor = new SimplexASTVisitor();
+    const r = visitor.visit(result);
 
     // console.log(listener.emulationCode);
 

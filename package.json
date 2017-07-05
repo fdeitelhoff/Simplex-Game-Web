@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "antlr4ts": "antlr4ts -listener -lib src/simplex/grammar/ src/simplex/grammar/SimplexParser.g4 src/simplex/grammar/SimplexLexer.g4 -o src/simplex/gen/"
+    "antlr4ts": "antlr4ts -visitor -lib src/simplex/grammar/ src/simplex/grammar/SimplexParser.g4 src/simplex/grammar/SimplexLexer.g4 -o src/simplex/gen/"
   },
   "private": true,
   "dependencies": {
