@@ -13,19 +13,19 @@ export class SimplexASTVisitor extends AbstractParseTreeVisitor<string> implemen
     return 'test from default result';
   }
 
-  public visitExpBoolean (ctx: ExpBooleanContext): string {
+  visitExpBoolean = function (ctx: ExpBooleanContext): string {
     console.log(ctx);
 
     return 'v';
   }
 
-  public visitSimplex (ctx: SimplexContext): string {
+  visitSimplex = function (ctx: SimplexContext): string {
     console.log(ctx);
 
     return 'v2';
   }
 
-  public visitTypeless (ctx: TypelessContext): string {
+  visitTypeless = function (ctx: TypelessContext): string {
     console.log(ctx);
 
     return 'v3';

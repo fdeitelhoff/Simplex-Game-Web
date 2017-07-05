@@ -66,13 +66,13 @@ export class AppComponent implements AfterViewInit {
     parser.addErrorListener(this.simplexErrorListener);
 
     const result = parser.simplex();
-    // const listener = new SimplexASTListener();
+    const listener = new SimplexASTListener();
 
-    // ParseTreeWalker.DEFAULT.walk(listener, result);
-    const visitor = new SimplexASTVisitor();
-    const r = visitor.visit(result);
+    ParseTreeWalker.DEFAULT.walk(listener, result);
+    // const visitor = new SimplexASTVisitor();
+    // const r = visitor.visit(result);
 
-    // console.log(listener.emulationCode);
+    console.log(listener.emulationCode);
 
     // this.cat.x += 5;
     // this.cat.y += 5;
@@ -82,9 +82,9 @@ export class AppComponent implements AfterViewInit {
 
 
     try {
-      this._simulation = new Function('ev3', 'x', 'y', 'SimulatorError', 'test');
-      const t = this._simulation(this.cat, 5, 10, new SimulatorError('<No Message Provided!>'));
-      console.log('Return von X: ' + t.x);
+      this._simulation = new Function('ev3', 'SimulatorError', listener.emulationCode);
+      const t = this._simulation(this.cat, new SimulatorError('<No Message Provided!>'));
+      // console.log('Return von X: ' + t.x);
     } catch (error) {
       console.log('error in sim: ' + error);
     }
