@@ -1,3 +1,4 @@
+import { LoopStatementContext, ExpIDContext } from './../simplex/gen/SimplexParser';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { SimplexParserListener } from 'simplex/gen/SimplexParserListener';
 import {
@@ -5,7 +6,7 @@ import {
   IfStatementContext, ExpParenthesisContext, ExpressionContext, StmtActionCallContext,
   ReturnStatementContext, SimplexContext, AssignmentDeclarationContext, ExpNumberContext,
   ExpBooleanContext, ExpStringContext, ExpBinaryArithmeticContext,
-  AssignmentContext, ActionCallContext, ElseStatementContext, ElseifStatementContext
+  AssignmentContext, ActionCallContext, ElseStatementContext, ElseifStatementContext, StmtLoopContext
 } from 'simplex/gen/SimplexParser';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
@@ -33,6 +34,10 @@ export class SimplexASTListener implements SimplexParserListener {
 
   exitSimplex (ctx: SimplexContext) {
     this.emulationCode += `\n\n
+      function log(message) {
+        console.log('Program Output: ' + message);
+      }
+
       function forward (x) {
         ev3.x += x;
       }
@@ -67,6 +72,10 @@ export class SimplexASTListener implements SimplexParserListener {
 
   exitExpString (ctx: ExpStringContext) {
     this.parseTreeProperty.set(ctx, ctx._value.text);
+  }
+
+  exitExpID (ctx: ExpIDContext) {
+    this.parseTreeProperty.set(ctx, ctx._name.text);
   }
 
   exitExpBinaryArithmetic (ctx: ExpBinaryArithmeticContext) {
@@ -156,18 +165,18 @@ export class SimplexASTListener implements SimplexParserListener {
       const para = ctx._params[i];
 
       if (i === 0) {
-        parameter += `${para._type.text} ${para._name.text}`;
+        parameter += `${para._name.text}`;
       } else {
-        parameter += `, ${para._type.text} ${para._name.text}`;
+        parameter += `, ${para._name.text}`;
       }
     }
 
     const ret = ctx._ret.text;
 // : ${this.emulationTypes.get(ret)}
     if (this.emulationTypes.has(ret)) {
-      this.emulationCode += `\n\n ${ctx._name.text}(${parameter})\n{\n`;
+      this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
     } else {
-      this.emulationCode += `\n\n ${ctx._name.text}(${parameter})\n{\n`;
+      this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
     }
   }
 
@@ -210,16 +219,31 @@ export class SimplexASTListener implements SimplexParserListener {
   enterElseifStatement (ctx: ElseifStatementContext) {
     const elseIfStatement = `${ctx._exp.text}`;
 
-    this.emulationCode += `} elseif ${elseIfStatement} {\n`;
+    this.emulationCode += `} else if ${elseIfStatement} {\n`;
   }
 
-  exitElseifStatement (ctx: ElseifStatementContext) {
+  /*exitElseifStatement (ctx: ElseifStatementContext) {
     this.emulationCode += `}\n`;
-  }
+  }*/
 
   enterElseStatement (ctx: ElseStatementContext) {
     const elseStatement = `\n} else {\n`;
 
     this.emulationCode += elseStatement;
+  }
+
+  enterLoopStatement (ctx: LoopStatementContext) {
+    const expression = ctx._exp.text;
+    const type = ctx._type.text;
+
+    if (type === 'times') {
+      this.emulationCode += `\nfor (let i = 0; i < ${expression}; i++) {\n`;
+    } else {
+      this.emulationCode += `\nwhile (${expression}) {\n`;
+    }
+  }
+
+  exitLoopStatement (ctx: LoopStatementContext) {
+    this.emulationCode += `\n}\n`;
   }
 }

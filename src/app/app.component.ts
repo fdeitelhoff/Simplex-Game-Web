@@ -72,6 +72,8 @@ export class AppComponent implements AfterViewInit {
     // const visitor = new SimplexASTVisitor();
     // const r = visitor.visit(result);
 
+    // console.log(r);
+
     console.log(listener.emulationCode);
 
     // this.cat.x += 5;
