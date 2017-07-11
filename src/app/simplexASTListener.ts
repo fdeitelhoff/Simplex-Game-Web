@@ -1,3 +1,5 @@
+import { ActionScope } from './action.scope';
+import { Result } from './result';
 import { LoopStatementContext, ExpIDContext } from './../simplex/gen/SimplexParser';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { SimplexParserListener } from 'simplex/gen/SimplexParserListener';
@@ -10,13 +12,15 @@ import {
 } from 'simplex/gen/SimplexParser';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
+import { Scope } from './scope';
 
 export class SimplexASTListener implements SimplexParserListener {
   private parseTreeProperty: Map<ParserRuleContext, any>;
   public emulationCode: string;
   private emulationTypes: Map<string, string>;
 
-  // private emulatorCodeBlocks: Map<
+  private emulatorCodeBlocks: Map<ParserRuleContext, any>;
+  private currentScope: Scope;
 
   constructor() {
     this.parseTreeProperty = new Map();
@@ -26,10 +30,12 @@ export class SimplexASTListener implements SimplexParserListener {
     this.emulationTypes.set('number', 'number');
     this.emulationTypes.set('boolean', 'boolean');
     this.emulationTypes.set('text', 'string');
+
+    this.emulatorCodeBlocks = new Map();
   }
 
   enterSimplex (ctx: SimplexContext) {
-
+    this.currentScope = new Scope('main');
   }
 
   exitSimplex (ctx: SimplexContext) {
@@ -59,23 +65,29 @@ export class SimplexASTListener implements SimplexParserListener {
   }
 
   exitExpInteger (ctx: ExpIntegerContext) {
-    this.parseTreeProperty.set(ctx, +ctx._value.text);
+    this.parseTreeProperty.set(ctx, new Result<number>(+ctx._value.text));
   }
 
   exitExpNumber (ctx: ExpNumberContext) {
-    this.parseTreeProperty.set(ctx, +ctx._value.text);
+    this.parseTreeProperty.set(ctx, new Result<number>(+ctx._value.text));
   }
 
   exitExpBoolean (ctx: ExpBooleanContext) {
-    this.parseTreeProperty.set(ctx, ctx._value.text);
+    this.parseTreeProperty.set(ctx, new Result<boolean>(ctx._value.text.toLowerCase() === 'true'));
   }
 
   exitExpString (ctx: ExpStringContext) {
-    this.parseTreeProperty.set(ctx, ctx._value.text);
+    this.parseTreeProperty.set(ctx, new Result<string>(ctx._value.text));
   }
 
   exitExpID (ctx: ExpIDContext) {
-    this.parseTreeProperty.set(ctx, ctx._name.text);
+    const symbolValue = this.currentScope.findSymbol(ctx._name.text);
+
+    if (symbolValue === null) {
+      console.log('Symbol not found!');
+    } else {
+      this.parseTreeProperty.set(ctx, new Result<any>(symbolValue)); // TODO: Ihh, any!
+    }
   }
 
   exitExpBinaryArithmetic (ctx: ExpBinaryArithmeticContext) {
@@ -83,14 +95,14 @@ export class SimplexASTListener implements SimplexParserListener {
 
     const left = this.parseTreeProperty.get(ctx._expLeft);
     const right = this.parseTreeProperty.get(ctx._expRight);
-    let result = '';
+    const result = new Result<number>();
 
     if (operator === '+') {
-      // result = left + right;
-      result += `${left} + ${right}`;
+      result.result = left.result + right.result;
+      // result += `${left} + ${right}`;
     } else if (operator === '-') {
-      // result = left - right;
-      result += `${left} - ${right}`;
+      result.result = left.result - right.result;
+      // result += `${left} - ${right}`;
     }
 
     this.parseTreeProperty.set(ctx, result);
@@ -127,9 +139,15 @@ export class SimplexASTListener implements SimplexParserListener {
 
   exitAssignmentDeclaration (ctx: AssignmentDeclarationContext) {
     const expression = this.parseTreeProperty.get(ctx._exp);
+    console.log('bla');
+    console.log(this.parseTreeProperty);
+    console.log(expression);
+
+    this.currentScope.define(ctx._name.text, expression.result);
+    console.log(this.currentScope);
     // const expression = ctx._exp.text;
 // : ${this.emulationTypes.get(ctx._type.text)}
-    this.emulationCode += `\nlet ${ctx._name.text} = ${expression};\n`;
+    // this.emulationCode += `\nlet ${ctx._name.text} = ${expression};\n`;
   }
 
   exitAssignment (ctx: AssignmentContext) {
@@ -158,7 +176,7 @@ export class SimplexASTListener implements SimplexParserListener {
   }
 
   enterActionDeclaration (ctx: ActionDeclarationContext) {
-    let parameter = '';
+    /*let parameter = '';
 
     for (let i = 0; i < ctx._params.length; i++) {
       // const para = this.parseTreeProperty.get(ctx._params[i]);
@@ -177,14 +195,24 @@ export class SimplexASTListener implements SimplexParserListener {
       this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
     } else {
       this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
-    }
+    }*/
+
+    this.currentScope = new ActionScope('action', this.currentScope);
   }
 
   exitReturnStatement (ctx: ReturnStatementContext) {
-    this.emulationCode += `\nreturn ${ctx._exp.text}\n`;
+    // this.emulationCode += `\nreturn ${ctx._exp.text}\n`;
+    (<ActionScope>this.currentScope).returnResult = this.parseTreeProperty.get(ctx._exp);
+    // this.parseTreeProperty.set(ctx, this.parseTreeProperty.get(ctx._exp));
+    this.parseTreeProperty.delete(ctx._exp);
   }
 
   exitActionDeclaration (ctx: ActionDeclarationContext) {
+    console.log('jetzt');
+    // console.log(this.parseTreeProperty);
+    // console.log(ctx);
+    this.parseTreeProperty.set(ctx, (<ActionScope>this.currentScope).returnResult); // this.parseTreeProperty.get(ctx._ret));
+   // this.parseTreeProperty.delete(ctx._ret);
     /*let parameter = '';
 
     for (let i = 0; i < ctx._params.length; i++) {
@@ -199,7 +227,10 @@ export class SimplexASTListener implements SimplexParserListener {
 
     this.emulationCode += `\n\nprivate ${ctx._name.text}(${parameter})\n{\n`;*/
 
-    this.emulationCode += `}\n\n`;
+    // this.emulationCode += `}\n\n`;
+    if (this.currentScope.enclosingScope !== undefined) {
+        this.currentScope = this.currentScope.enclosingScope;
+    }
   }
 
   exitActionParameter (ctx: ActionParameterContext) {
