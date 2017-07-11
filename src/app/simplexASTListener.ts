@@ -1,4 +1,3 @@
-import { LoopStatementContext, ExpIDContext } from './../simplex/gen/SimplexParser';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { SimplexParserListener } from 'simplex/gen/SimplexParserListener';
 import {
@@ -6,7 +5,9 @@ import {
   IfStatementContext, ExpParenthesisContext, ExpressionContext, StmtActionCallContext,
   ReturnStatementContext, SimplexContext, AssignmentDeclarationContext, ExpNumberContext,
   ExpBooleanContext, ExpStringContext, ExpBinaryArithmeticContext,
-  AssignmentContext, ActionCallContext, ElseStatementContext, ElseifStatementContext, StmtLoopContext
+  AssignmentContext, ActionCallContext, ElseStatementContext, ElseifStatementContext,
+  StmtLoopContext, ExpBinaryLogicContext, ExpActionCallContext, LoopStatementContext, ExpIDContext,
+  ActionExpressionsContext
 } from 'simplex/gen/SimplexParser';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
@@ -16,11 +17,15 @@ export class SimplexASTListener implements SimplexParserListener {
   public emulationCode: string;
   private emulationTypes: Map<string, string>;
 
-  // private emulatorCodeBlocks: Map<
+  private ifCount: number;
+  private elseIfCount: number;
+  private loopCount: number;
+  private indent: number;
 
   constructor() {
     this.parseTreeProperty = new Map();
     this.emulationCode = '// Generated...\n\n';
+
     this.emulationTypes = new Map();
     this.emulationTypes.set('integer', 'number');
     this.emulationTypes.set('number', 'number');
@@ -29,33 +34,33 @@ export class SimplexASTListener implements SimplexParserListener {
   }
 
   enterSimplex (ctx: SimplexContext) {
-
+    this.ifCount = 0;
+    this.elseIfCount = 0;
+    this.loopCount = 0;
+    this.indent = 0;
   }
 
   exitSimplex (ctx: SimplexContext) {
-    this.emulationCode += `\n\n
-      function log(message) {
-        console.log('Program Output: ' + message);
-      }
+    this.emulationCode += `\n
+function print(message) {
+  console.log('Program Output: ' + message);
+}
 
-      function forward (x) {
-        ev3.x += x;
-      }
+function forward (x) {
+  ev3.x += x;
+}
 
-      function back (x) {
-        ev3.x -= x;
-      }
+function back (x) {
+  ev3.x -= x;
+}
 
-      function left (y) {
-        ev3.y -= y;
-      }
+function left (y) {
+  ev3.y -= y;
+}
 
-      function right (y) {
-        ev3.y += y;
-      }
-    `;
-
-    this.emulationCode += ``;
+function right (y) {
+  ev3.y += y;
+}`;
   }
 
   exitExpInteger (ctx: ExpIntegerContext) {
@@ -86,10 +91,8 @@ export class SimplexASTListener implements SimplexParserListener {
     let result = '';
 
     if (operator === '+') {
-      // result = left + right;
       result += `${left} + ${right}`;
     } else if (operator === '-') {
-      // result = left - right;
       result += `${left} - ${right}`;
     }
 
@@ -107,10 +110,8 @@ export class SimplexASTListener implements SimplexParserListener {
     let result = '';
 
     if (operator === '>') {
-      // result = left > right;
       result += `${left} > ${right}`;
     } else if (operator === '<') {
-      // result = left < right;
       result += `${left} < ${right}`;
     }
 
@@ -120,48 +121,103 @@ export class SimplexASTListener implements SimplexParserListener {
     this.parseTreeProperty.delete(ctx._expRight);
   }
 
-  /*exitExpParenthesis (ctx: ExpParenthesisContext) {
-    console.log(ctx._expCenter);
-    this.parseTreeProperty.set(ctx, ctx._expCenter);
-  }*/
+  exitExpBinaryLogic (ctx: ExpBinaryLogicContext) {
+    const operator = ctx._symbol.text;
+
+    const left = this.parseTreeProperty.get(ctx._expLeft);
+    const right = this.parseTreeProperty.get(ctx._expRight);
+    let result = '';
+
+    if (operator === 'and') {
+      result += `${left} && ${right}`;
+    } else if (operator === 'or') {
+      result += `${left} || ${right}`;
+    }
+
+    this.parseTreeProperty.set(ctx, result);
+
+    this.parseTreeProperty.delete(ctx._expLeft);
+    this.parseTreeProperty.delete(ctx._expRight);
+  }
+
+  exitExpParenthesis (ctx: ExpParenthesisContext) {
+    this.parseTreeProperty.set(ctx, this.parseTreeProperty.get(ctx._expCenter));
+
+    this.parseTreeProperty.delete(ctx._expCenter);
+  }
 
   exitAssignmentDeclaration (ctx: AssignmentDeclarationContext) {
     const expression = this.parseTreeProperty.get(ctx._exp);
-    // const expression = ctx._exp.text;
-// : ${this.emulationTypes.get(ctx._type.text)}
-    this.emulationCode += `\nlet ${ctx._name.text} = ${expression};\n`;
+
+    const indent = new Array(this.indent * 4).join(' ');
+
+    this.emulationCode += `${indent}let ${ctx._name.text} = ${expression};\n`;
+
+    this.parseTreeProperty.delete(ctx._exp);
   }
 
   exitAssignment (ctx: AssignmentContext) {
+    const indent = new Array(this.indent * 4).join(' ');
+
     const expression = this.parseTreeProperty.get(ctx._exp);
 
-    this.emulationCode += `\n${ctx._name.text} = ${expression};\n`;
+    this.emulationCode += `${indent}${ctx._name.text} = ${expression};\n`;
+
+    this.parseTreeProperty.get(ctx._exp);
   }
 
-  exitStmtActionCall (ctx2: StmtActionCallContext) {
-    const ctx = ctx2.actionCall();
+  exitExpActionCall (ctx: ExpActionCallContext) {
+    this.parseTreeProperty.set(ctx, this.parseTreeProperty.get(ctx.actionCall()));
 
-    const parameter = ctx._exp.text;
+    this.parseTreeProperty.delete(ctx.actionCall());
+  }
 
-    /*for (let i = 0; i < ctx._exp._exp.length; i++) {
-      // const para = this.parseTreeProperty.get(ctx._exp._exp[i]);
-      const para = ctx._exp.text;
+  exitStmtActionCall (ctx: StmtActionCallContext) {
+    const indent = new Array(this.indent * 4).join(' ');
 
-      if (i === 0) {
-        parameter += `${para}`;
-      } else {
-        parameter += `, ${para}`;
+    this.emulationCode += `${indent}${this.parseTreeProperty.get(ctx.actionCall())};\n`;
+
+    this.parseTreeProperty.delete(ctx.actionCall());
+  }
+
+  exitActionCall (ctx: ActionCallContext) {
+    let parameter = '';
+
+    if (this.parseTreeProperty.has(ctx._exp)) {
+      const expressions = this.parseTreeProperty.get(ctx._exp);
+
+      for (let i = 0; i < expressions.length; i++) {
+        const para = this.parseTreeProperty.get(expressions[i]);
+
+        if (i === 0) {
+          parameter += `${para}`;
+        } else {
+          parameter += `, ${para}`;
+        }
+
+        this.parseTreeProperty.delete(expressions[i]);
       }
-    }*/
 
-    this.emulationCode += `${ctx._name.text}(${parameter});\n`;
+      this.parseTreeProperty.delete(ctx._exp)
+    }
+
+    this.parseTreeProperty.set(ctx, `${ctx._name.text}(${parameter})`);
+  }
+
+  exitActionExpressions (ctx: ActionExpressionsContext) {
+    const expressions = [];
+
+    for (const exp of ctx._exp) {
+      expressions.push(exp);
+    }
+
+    this.parseTreeProperty.set(ctx, expressions);
   }
 
   enterActionDeclaration (ctx: ActionDeclarationContext) {
     let parameter = '';
 
     for (let i = 0; i < ctx._params.length; i++) {
-      // const para = this.parseTreeProperty.get(ctx._params[i]);
       const para = ctx._params[i];
 
       if (i === 0) {
@@ -171,79 +227,111 @@ export class SimplexASTListener implements SimplexParserListener {
       }
     }
 
-    const ret = ctx._ret.text;
-// : ${this.emulationTypes.get(ret)}
-    if (this.emulationTypes.has(ret)) {
-      this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
-    } else {
-      this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
+    if (ctx._ret !== undefined) {
+      const ret = ctx._ret.text;
+
+      if (this.emulationTypes.has(ret)) {
+        this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
+      } else {
+        this.emulationCode += `\n\nfunction ${ctx._name.text}(${parameter})\n{\n`;
+      }
     }
   }
 
   exitReturnStatement (ctx: ReturnStatementContext) {
-    this.emulationCode += `\nreturn ${ctx._exp.text}\n`;
+    const returnStatement = this.parseTreeProperty.get(ctx._exp);
+
+    this.emulationCode += `    return ${returnStatement}\n`;
+
+    this.parseTreeProperty.delete(ctx._exp);
   }
 
   exitActionDeclaration (ctx: ActionDeclarationContext) {
-    /*let parameter = '';
-
-    for (let i = 0; i < ctx._params.length; i++) {
-      const para = this.parseTreeProperty.get(ctx._params[i]);
-
-      if (i === 0) {
-        parameter += `${para.type} ${para.name}`;
-      } else {
-        parameter += `, ${para.type} ${para.name}`;
-      }
-    }
-
-    this.emulationCode += `\n\nprivate ${ctx._name.text}(${parameter})\n{\n`;*/
-
     this.emulationCode += `}\n\n`;
   }
 
-  exitActionParameter (ctx: ActionParameterContext) {
-    this.parseTreeProperty.set(ctx, { 'type': ctx._type.text, 'name': ctx._name.text });
-  }
-
   enterIfStatement (ctx: IfStatementContext) {
-    const ifStatement = `${ctx._exp.text}`;
+    const indent = new Array(this.indent * 4).join(' ');
 
-    this.emulationCode += `if ${ifStatement} {\n`;
+    this.emulationCode += `${indent}if (if-expression-label-${++this.ifCount}) \n${indent}{\n`;
+
+    this.indent++;
   }
 
   exitIfStatement (ctx: IfStatementContext) {
-    this.emulationCode += `}\n`;
+    this.indent--;
+
+    const indent = new Array(this.indent * 4).join(' ');
+
+    const expression = this.parseTreeProperty.get(ctx._exp);
+
+    this.emulationCode = this.emulationCode.replace(`if-expression-label-${this.ifCount}`, expression);
+
+    this.emulationCode += `${indent}}${indent}\n`;
+
+    this.parseTreeProperty.delete(ctx._exp);
+
+    this.ifCount--;
   }
 
   enterElseifStatement (ctx: ElseifStatementContext) {
-    const elseIfStatement = `${ctx._exp.text}`;
+    this.indent--;
 
-    this.emulationCode += `} else if ${elseIfStatement} {\n`;
+    const indent = new Array(this.indent * 4).join(' ');
+
+    this.emulationCode += `${indent}}\n${indent}else if (elseif-expression-label-${++this.elseIfCount}) \n${indent}{\n`;
+
+    this.indent++;
   }
 
-  /*exitElseifStatement (ctx: ElseifStatementContext) {
-    this.emulationCode += `}\n`;
-  }*/
+  exitElseifStatement (ctx: ElseifStatementContext) {
+    const elseIfStatement = this.parseTreeProperty.get(ctx._exp);
+
+    this.emulationCode = this.emulationCode.replace(`elseif-expression-label-${this.elseIfCount}`, elseIfStatement);
+
+    this.parseTreeProperty.delete(ctx._exp);
+
+    this.elseIfCount--;
+    this.indent--;
+  }
 
   enterElseStatement (ctx: ElseStatementContext) {
-    const elseStatement = `\n} else {\n`;
+    const indent = new Array(this.indent * 4).join(' ');
+
+    const elseStatement = `${indent}}\n${indent}else \n${indent}{\n`;
 
     this.emulationCode += elseStatement;
+
+    this.indent++;
   }
 
   enterLoopStatement (ctx: LoopStatementContext) {
-    const expression = ctx._exp.text;
+    const indent = new Array(this.indent * 4).join(' ');
+
     const type = ctx._type.text;
 
     if (type === 'times') {
-      this.emulationCode += `\nfor (let i = 0; i < ${expression}; i++) {\n`;
+      this.emulationCode += `\n${indent}for (let i = 0; i < loop-expression-label-${++this.loopCount}; i++) \n${indent}{\n`;
     } else {
-      this.emulationCode += `\nwhile (${expression}) {\n`;
+      this.emulationCode += `\n${indent}while (loop-expression-label-${++this.loopCount}) \n${indent}{\n`;
     }
+
+    this.indent++;
   }
 
   exitLoopStatement (ctx: LoopStatementContext) {
-    this.emulationCode += `\n}\n`;
+    this.indent--;
+
+    const indent = new Array(this.indent * 4).join(' ');
+
+    const expression = this.parseTreeProperty.get(ctx._exp);
+
+    this.emulationCode = this.emulationCode.replace(`loop-expression-label-${this.loopCount}`, expression);
+
+    this.emulationCode += `${indent}}\n`;
+
+    this.parseTreeProperty.delete(ctx._exp);
+
+    this.loopCount--;
   }
 }
