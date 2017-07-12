@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 
-import * as blockly from 'node-blockly';
+// import * as blockly from 'node-blockly';
 
 @Component({
   selector: 'sapt-blockly-editor',
@@ -15,13 +15,13 @@ export class BlocklyEditorComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('bla');
+    // console.log('bla');
 
     const myDiv: HTMLDivElement = this.editorContent.nativeElement;
 
-    console.log(myDiv);
+    // console.log(myDiv);
 
-    const workspace = blockly.inject(myDiv);
+    // const workspace = blockly.inject(myDiv);
     /*const loaderScript = document.createElement('script');
     loaderScript.type = 'text/javascript';
     loaderScript.src = 'assets/node-blockly/lib/blockly_compressed.js';

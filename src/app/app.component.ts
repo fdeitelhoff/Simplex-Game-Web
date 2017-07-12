@@ -30,29 +30,6 @@ export class AppComponent implements AfterViewInit {
   constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
     this._dataService = dataService;
-
-    /*const typeScriptCode = `
-      if (ev3.x > 25 || ev3.y > 25) {
-        SimulatorError.message = 'I am a test!';
-        throw SimulatorError;
-      } else {
-        for (let i = 1; i <= 24; i++) {
-          ev3.x += 1;
-          ev3.y += 1;
-          console.log(ev3.x);
-        }
-      }
-
-      /* else {
-        ev3.x += x;
-        ev3.y += y;
-
-        // console.log(ev3.x + " " + ev3.y);
-      }
-
-      return { 'x': ev3.x };
-    `;
-    */
   }
 
   public handler() {
