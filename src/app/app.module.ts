@@ -9,13 +9,13 @@ import { DataService } from './data.service';
 @NgModule({
   declarations: [
     AppComponent,
-    MonacoEditorComponent,
-    BlocklyEditorComponent
+    MonacoEditorComponent
+    // BlocklyEditorComponent
   ],
   imports: [
     BrowserModule
   ],
   providers: [DataService],
-  bootstrap: [AppComponent, MonacoEditorComponent, BlocklyEditorComponent]
+  bootstrap: [AppComponent, MonacoEditorComponent] // , BlocklyEditorComponent]
 })
 export class AppModule { }
