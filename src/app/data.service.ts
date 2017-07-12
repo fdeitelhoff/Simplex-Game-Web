@@ -1,17 +1,27 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class DataService {
-
-  private _simplexCode: any;
+  private subject = new Subject<any>();
+  private _simplexCode: string;
 
   constructor() { }
 
-  get simplexCode(): any {
+  get simplexCode(): string {
     return this._simplexCode;
   }
 
-  set simplexCode(simplexCode: any) {
+  set simplexCode(simplexCode: string) {
     this._simplexCode = simplexCode;
+  }
+
+  compileSimplex() {
+    this.subject.next();
+  }
+
+  getMessage(): Observable<any> {
+      return this.subject.asObservable();
   }
 }

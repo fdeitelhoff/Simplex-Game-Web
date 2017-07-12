@@ -7,7 +7,6 @@ declare const require: any;
 @Component({
   selector: 'sapt-monaco-editor',
   templateUrl: './monaco-editor.component.html'
-  // styleUrls: ['./monaco-editor.component.css']
 })
 export class MonacoEditorComponent implements OnInit, AfterViewInit {
 
@@ -142,6 +141,7 @@ export class MonacoEditorComponent implements OnInit, AfterViewInit {
 
     _this.editor.getModel().onDidChangeContent(function () {
       _this._dataService.simplexCode = _this.editor.getValue();
+      _this._dataService.compileSimplex();
     });
 
     // Needed for the first parse document call when the editor is loaded with content.

@@ -12,6 +12,7 @@ import { SimplexLexer } from './../simplex/gen/SimplexLexer';
 import { SimplexParser } from './../simplex/gen/SimplexParser';
 
 import * as PIXI from 'pixi.js';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'sapt-root',
@@ -26,44 +27,46 @@ export class AppComponent implements AfterViewInit {
   private errors: any[];
   private _dataService: DataService;
   private _simulation: Function;
+  private listener: SimplexASTListener;
+
+  private subscription: Subscription;
 
   constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
     this._dataService = dataService;
+
+    this.subscription = this._dataService.getMessage().subscribe(() => { this.compile(); });
   }
 
-  public handler() {
+  private compile() {
     const chars = new ANTLRInputStream(this._dataService.simplexCode);
     const lexer = new SimplexLexer(chars);
     const tokens = new CommonTokenStream(lexer);
     const parser = new SimplexParser(tokens);
-    parser.buildParseTree = true;
 
     parser.removeErrorListeners();
     parser.addErrorListener(this.simplexErrorListener);
 
-    const result = parser.simplex();
-    const listener = new SimplexASTListener();
+    this.simplexErrorListener.resetErrors();
 
-    ParseTreeWalker.DEFAULT.walk(listener, result);
+    const result = parser.simplex();
+    this.listener = new SimplexASTListener();
+
+    ParseTreeWalker.DEFAULT.walk(this.listener, result);
+    this.errors = this.simplexErrorListener.errors;
+
     // const visitor = new SimplexASTVisitor();
     // const r = visitor.visit(result);
 
-    // console.log(r);
+    // console.log(listener.emulationCode);
 
-    console.log(listener.emulationCode);
-
-    // this.cat.x += 5;
-    // this.cat.y += 5;
-
-    this.errors = this.simplexErrorListener.errors;
     // console.log(window['workspace']);
+  }
 
-
+  public run() {
     try {
-      this._simulation = new Function('ev3', 'SimulatorError', listener.emulationCode);
+      this._simulation = new Function('ev3', 'SimulatorError', this.listener.emulationCode);
       const t = this._simulation(this.cat, new SimulatorError('<No Message Provided!>'));
-      // console.log('Return von X: ' + t.x);
     } catch (error) {
       console.log('error in sim: ' + error);
     }

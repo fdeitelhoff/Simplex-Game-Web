@@ -14,4 +14,8 @@ export class SimplexErrorListener implements ANTLRErrorListener<any> {
     charPositionInLine: number, msg: string, e: RecognitionException): void {
       this.errors.push({ 'line': line, 'char': charPositionInLine, 'msg': msg });
   }
+
+  public resetErrors() {
+    this.errors = [];
+  }
 }

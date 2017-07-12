@@ -308,15 +308,17 @@ function right (y) {
   enterLoopStatement (ctx: LoopStatementContext) {
     const indent = new Array(this.indent * 4).join(' ');
 
-    const type = ctx._type.text;
+    if (ctx._type !== undefined) {
+      const type = ctx._type.text;
 
-    if (type === 'times') {
-      this.emulationCode += `\n${indent}for (let i = 0; i < loop-expression-label-${++this.loopCount}; i++) \n${indent}{\n`;
-    } else {
-      this.emulationCode += `\n${indent}while (loop-expression-label-${++this.loopCount}) \n${indent}{\n`;
+      if (type === 'times') {
+        this.emulationCode += `\n${indent}for (let i = 0; i < loop-expression-label-${++this.loopCount}; i++) \n${indent}{\n`;
+      } else {
+        this.emulationCode += `\n${indent}while (loop-expression-label-${++this.loopCount}) \n${indent}{\n`;
+      }
+
+      this.indent++;
     }
-
-    this.indent++;
   }
 
   exitLoopStatement (ctx: LoopStatementContext) {
