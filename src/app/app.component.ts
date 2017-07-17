@@ -86,12 +86,14 @@ function back (x) {
   ev3.x -= x;
 }
 
-function left (y) {
-  ev3.y -= y;
+function left () {
+  const radians = 90 * (Math.PI/180);
+  ev3.rotation += radians;
 }
 
-function right (y) {
-  ev3.y += y;
+function right () {
+  const radians = 90 * (Math.PI/180);
+  ev3.rotation -= radians;
 }`;
 
       this._simulation = new Function('ev3', 'SimulatorError', this.blocklyCode); // this.listener.emulationCode);
@@ -119,7 +121,9 @@ function right (y) {
         PIXI.loader.resources['./assets/cat.png'].texture
 
       );
-
+      _this.cat.x = 50;
+      _this.cat.y = 50;
+      _this.cat.anchor.set(0.5);
       stage.addChild(_this.cat);
 
       function gameLoop() {
