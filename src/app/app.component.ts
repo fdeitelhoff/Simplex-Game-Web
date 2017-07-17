@@ -30,12 +30,20 @@ export class AppComponent implements AfterViewInit {
   private listener: SimplexASTListener;
 
   private subscription: Subscription;
+  private blocklyWorkspace: any;
+  private blocklyCode: string;
 
   constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
     this._dataService = dataService;
 
     this.subscription = this._dataService.getMessage().subscribe(() => { this.compile(); });
+
+    this.blocklyWorkspace = window['workspace'];
+    this.blocklyWorkspace.addChangeListener((event: any) => {
+      this.blocklyCode = window['blockly'].JavaScript.workspaceToCode(this.blocklyWorkspace);
+      console.log(this.blocklyCode);
+    });
   }
 
   private compile() {
@@ -65,7 +73,28 @@ export class AppComponent implements AfterViewInit {
 
   public run() {
     try {
-      this._simulation = new Function('ev3', 'SimulatorError', this.listener.emulationCode);
+    this.blocklyCode += `\n
+function print(message) {
+  console.log('Program Output: ' + message);
+}
+
+function forward (x) {
+  ev3.x += x;
+}
+
+function back (x) {
+  ev3.x -= x;
+}
+
+function left (y) {
+  ev3.y -= y;
+}
+
+function right (y) {
+  ev3.y += y;
+}`;
+
+      this._simulation = new Function('ev3', 'SimulatorError', this.blocklyCode); // this.listener.emulationCode);
       const t = this._simulation(this.cat, new SimulatorError('<No Message Provided!>'));
     } catch (error) {
       console.log('error in sim: ' + error);

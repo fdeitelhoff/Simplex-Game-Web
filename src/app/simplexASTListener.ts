@@ -40,29 +40,6 @@ export class SimplexASTListener implements SimplexParserListener {
     this.indent = 0;
   }
 
-  exitSimplex (ctx: SimplexContext) {
-    this.emulationCode += `\n
-function print(message) {
-  console.log('Program Output: ' + message);
-}
-
-function forward (x) {
-  ev3.x += x;
-}
-
-function back (x) {
-  ev3.x -= x;
-}
-
-function left (y) {
-  ev3.y -= y;
-}
-
-function right (y) {
-  ev3.y += y;
-}`;
-  }
-
   exitExpInteger (ctx: ExpIntegerContext) {
     this.parseTreeProperty.set(ctx, +ctx._value.text);
   }

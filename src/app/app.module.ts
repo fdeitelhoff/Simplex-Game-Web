@@ -1,4 +1,3 @@
-import { BlocklyEditorComponent } from './blocky-editor.component';
 import { MonacoEditorComponent } from './monaco-editor.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -10,12 +9,11 @@ import { DataService } from './data.service';
   declarations: [
     AppComponent,
     MonacoEditorComponent
-    // BlocklyEditorComponent
   ],
   imports: [
     BrowserModule
   ],
   providers: [DataService],
-  bootstrap: [AppComponent, MonacoEditorComponent] // , BlocklyEditorComponent]
+  bootstrap: [AppComponent, MonacoEditorComponent]
 })
 export class AppModule { }

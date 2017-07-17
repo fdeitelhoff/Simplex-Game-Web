@@ -8,9 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <script src="assets/blockly_compressed.js"></script>
-  <script src="assets/blocks_compressed.js"></script>
-  <script src="assets/msg/js/en.js"></script>
+<script src="assets/blockly_compressed.js"></script>
+<script src="assets/blocks_compressed.js"></script>
+<script src="assets/javascript_compressed.js"></script>
+<script src="assets/msg/js/en.js"></script>
 </head>
 <body>
   <!--<sapt-blockly-editor></sapt-blockly-editor>-->
@@ -26,9 +27,127 @@
     <block type="math_arithmetic"></block>
     <block type="text"></block>
     <block type="text_print"></block>
+    <block type="forward"></block>
+    <block type="back"></block>
+    <block type="left"></block>
+    <block type="right"></block>
   </xml>
 
 <script>
+  window.blockly = Blockly;
+
+  Blockly.Blocks['forward'] = {
+    init: function() {
+      this.jsonInit({
+        "type": "forward",
+        "message0": "forward %1",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "steps",
+            "check": "Number"
+          }
+        ],
+        "inputsInline": false,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 210,
+        "helpUrl": ""
+      });
+    }
+  };
+
+  Blockly.Blocks['back'] = {
+    init: function() {
+      this.jsonInit({
+        "type": "back",
+        "message0": "back %1",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "steps",
+            "check": "Number"
+          }
+        ],
+        "inputsInline": false,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 210,
+        "helpUrl": ""
+      });
+    }
+  };
+
+  Blockly.Blocks['left'] = {
+    init: function() {
+      this.jsonInit({
+        "type": "left",
+        "message0": "left %1",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "steps",
+            "check": "Number"
+          }
+        ],
+        "inputsInline": false,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 210,
+        "helpUrl": ""
+      });
+    }
+  };
+
+  Blockly.Blocks['right'] = {
+    init: function() {
+      this.jsonInit({
+        "type": "right",
+        "message0": "right %1",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "steps",
+            "check": "Number"
+          }
+        ],
+        "inputsInline": false,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 210,
+        "helpUrl": ""
+      });
+    }
+  };
+
+  Blockly.JavaScript['forward'] = function(block) {
+    var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
+    const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
+    var code = 'forward(' + steps + ');\n';
+    return code;
+  };
+
+  Blockly.JavaScript['back'] = function(block) {
+    var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
+    const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
+    var code = 'back(' + steps + ');\n';
+    return code;
+  };
+
+  Blockly.JavaScript['left'] = function(block) {
+    var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
+    const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
+    var code = 'left(' + steps + ');\n';
+    return code;
+  };
+
+  Blockly.JavaScript['right'] = function(block) {
+    var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
+    const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
+    var code = 'right(' + steps + ');\n';
+    return code;
+  };
+
   window.workspace = Blockly.inject('blocklyDiv',
       {toolbox: document.getElementById('toolbox')});
 </script>
