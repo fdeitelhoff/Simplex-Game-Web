@@ -22,7 +22,8 @@ import { Subscription } from 'rxjs/Subscription';
 export class AppComponent implements AfterViewInit {
   @ViewChild('canvas') editorContent: ElementRef;
 
-  private cat: PIXI.Sprite;
+  private robot: PIXI.Sprite;
+  private app: PIXI.Application;
   private simplexErrorListener: SimplexErrorListener;
   private errors: any[];
   private _dataService: DataService;
@@ -78,12 +79,24 @@ function print(message) {
   console.log('Program Output: ' + message);
 }
 
-function forward (x) {
-  ev3.x += x;
+function forward () {
+  const d = ev3.rotation * (180/Math.PI);
+  // console.log(d);
+  ev3.x += 30;
+
+  /*if (d === 90) {
+    ev3.x += 30;
+  } else if (d === 180) {
+    ev3.y += 30;
+  } else if (d === 270) {
+    ev3.x -= 30;
+  } else if (d === 360) {
+    ev3.y -= 30;
+  }*/
 }
 
-function back (x) {
-  ev3.x -= x;
+function back () {
+  ev3.x -= 30;
 }
 
 function left () {
@@ -96,43 +109,31 @@ function right () {
   ev3.rotation -= radians;
 }`;
 
-      this._simulation = new Function('ev3', 'SimulatorError', this.blocklyCode); // this.listener.emulationCode);
-      const t = this._simulation(this.cat, new SimulatorError('<No Message Provided!>'));
+      this._simulation = new Function('ev3', 'SimulatorError', 'app', this.blocklyCode); // this.listener.emulationCode);
+      const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.app);
     } catch (error) {
       console.log('error in sim: ' + error);
     }
   }
 
   ngAfterViewInit() {
-    const renderer = PIXI.autoDetectRenderer(512, 512);
+    this.app = new PIXI.Application(600, 600, {backgroundColor : 0x000000});
 
     const editor = this.editorContent.nativeElement;
-    editor.appendChild(renderer.view);
+    editor.appendChild(this.app.view);
 
-    const stage = new PIXI.Container();
+    this.robot = PIXI.Sprite.fromImage('./assets/cat.png');
 
-    PIXI.loader
-      .add('./assets/cat.png')
-      .load(setup);
+    this.robot.position.set(32, 32);
+    this.robot.anchor.set(0.5);
+    this.robot.rotation += 90 * (Math.PI / 180);
 
+    this.app.stage.addChild(this.robot);
     const _this = this;
-    function setup() {
-      _this.cat = new PIXI.Sprite(
-        PIXI.loader.resources['./assets/cat.png'].texture
 
-      );
-      _this.cat.x = 50;
-      _this.cat.y = 50;
-      _this.cat.anchor.set(0.5);
-      stage.addChild(_this.cat);
+    this.app.ticker.add(function (delta) {
+      // _this.cat.x += 1;
 
-      function gameLoop() {
-        requestAnimationFrame(gameLoop);
-
-        renderer.render(stage);
-      }
-
-      gameLoop();
-    }
+    });
   }
 }
