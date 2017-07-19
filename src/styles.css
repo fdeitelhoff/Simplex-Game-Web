@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+.container {
+  width: 1600px !important;
+  min-width: 1600px !important;
+  /* border: 2px solid black;*/
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}

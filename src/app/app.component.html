@@ -1,16 +1,56 @@
-<button (click)="run()">Klicken</button>
+<!-- <ngb-pagination [collectionSize]="40" [(page)]="page"></ngb-pagination>-->
 
-<div #canvas></div>
-
-<table>
-  <tr>
-    <th>Line</th>
-    <th>Char</th>
-    <th>Msg</th>
-  </tr>
-  <tr *ngFor="let error of errors">
-    <td>{{ error.line }}</td>
-    <td>{{ error.char }}</td>
-    <td>{{ error.msg }}</td>
-  </tr>
-</table>
+<div class="container">
+  <div class="row"> <!-- style="border: 2px solid black;">-->
+    <div class="col-7"> <!--style="border: 2px solid green;">-->
+      <div id="blocklyDiv2" #blocklyDiv></div>
+    </div>
+    <div class="col-5"> <!--style="border: 2px solid yellow;">-->
+      <div class="row"> <!--style="border: 2px solid brown;">-->
+        <div class="col-12">
+          <ngb-tabset>
+            <ngb-tab title="Aufgabe 1">
+              <ng-template ngbTabContent>
+                <p>Ich bin die Aufgabe 1... aslkdfj laskdjf laskdfj laskdfj klasdfj laskdfj lkasdfj aklsdfj aklsdfj asklfj asklfj laskdfj askldfj askldfj asklfj askldfj asklfj l
+                  aslkdfj laksjdf klasdjfkl asjf aklsjf laskfj klasjdf lkasjdf lkasdfj kdddddddddd skldjf laksdfj klasdjf slkdfj laskdjf laskdfj laskdfj klasdfj laskdfj lkasdfj aklsdfj aklsdfj asklfj asklfj laskdfj askldfj askldfj asklfj askldfj asklfj l
+                  aslkdfj laksjdf klasdjfkl asjf aklsjf laskfj klasjdf lkasjdf lkasdfj kdddddslkdfj laskdjf laskdfj laskdfj klasdfj laskdfj lkasdfj aklsdfj aklsdfj asklfj asklfj laskdfj askldfj askldfj asklfj askldfj asklfj l
+                  aslkdfj laksjdf klasdjfkl asjf aklsjf laskfj klasjdf lkasjdf lkasdfj kdddddslkdfj laskdjf laskdfj laskdfj klasdfj laskdfj lkasdfj aklsdfj aklsdfj asklfj asklfj laskdfj askldfj askldfj asklfj
+                </p>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Aufgabe 2">
+              <ng-template ngbTabContent>
+                <p>Ich bin die Aufgabe 2...
+                </p>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Aufgabe 3" [disabled]="true">
+              <ng-template ngbTabContent>
+                <p>Ich bin die Aufgabe 3... aslkdfj laskdjf laskdfj laskdfj klasdfj laskdfj lkasdfj aklsdfj aklsdfj asklfj asklfj laskdfj askldfj askldfj asklfj askldfj asklfj l
+                  aslkdfj laksjdf klasdjfkl asjf aklsjf laskfj klasjdf lkasjdf lkasdfj kdddddddddd skldjf laksdfj klasdjf
+                </p>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Aufgabe 4">
+              <ng-template ngbTabContent>
+                <p>Ich bin die Aufgabe 4... aslkdfj laskdjf laskdfj laskdfj klasdfj laskdfj lkasdfj aklsdfj aklsdfj asklfj asklfj laskdfj askldfj askldfj asklfj askldfj asklfj l
+                  aslkdfj laksjdf klasdjfkl asjf aklsjf laskfj klasjdf lkasjdf lkasdfj kdddddddddd skldjf laksdfj klasdjf
+                </p>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+      </div>
+      </div>
+      <div class="row"> <!-- style="border: 2px solid purple;">-->
+        <div class="col-12"> <!--style="padding-left: 15px;">-->
+          <button (click)="run()">Ausführen</button>
+        </div>
+      </div>
+      <div class="row align-items-end"> <!--style="border: 2px solid blue;">-->
+        <div class="col-12 align-self-end">
+          <div #canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

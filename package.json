@@ -22,9 +22,13 @@
     "@angular/platform-browser": "^4.2.6",
     "@angular/platform-browser-dynamic": "^4.2.6",
     "@angular/router": "^4.2.6",
+    "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.28",
     "antlr4ts": "^0.4.1-alpha.0",
+    "bootstrap": "^4.0.0-alpha.6",
     "core-js": "^2.4.1",
+    "font-awesome": "^4.7.0",
     "monaco-editor": "^0.9.0",
+    "node-blockly": "^1.0.21",
     "pixi.js": "^4.5.3",
     "rxjs": "^5.4.2",
     "zone.js": "^0.8.12"

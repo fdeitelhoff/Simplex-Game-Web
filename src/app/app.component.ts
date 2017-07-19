@@ -4,7 +4,7 @@ import { SimulatorError } from './simulatorError';
 import { DataService } from './data.service';
 import { SimplexASTListener } from './simplexASTListener';
 import { SimplexErrorListener } from './simplexErrorListener';
-import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, AfterViewInit, NgModule } from '@angular/core';
 
 import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree';
@@ -14,12 +14,18 @@ import { SimplexParser } from './../simplex/gen/SimplexParser';
 import * as PIXI from 'pixi.js';
 import { Subscription } from 'rxjs/Subscription';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
+// import { Blockly } from 'node-blockly';
+
 @Component({
   selector: 'sapt-root',
   templateUrl: './app.component.html',
   styles: []
 })
 export class AppComponent implements AfterViewInit {
+  page = 1;
+
   @ViewChild('canvas') editorContent: ElementRef;
 
   private robot: PIXI.Sprite;
@@ -165,5 +171,9 @@ function right () {
       // console.log(_this.robot.direction);
 
     });
+
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    const blocklyDiv2 = document.getElementById('blocklyDiv2');
+    blocklyDiv2.appendChild(blocklyDiv);
   }
 }
