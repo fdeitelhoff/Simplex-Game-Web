@@ -1,3 +1,4 @@
+import { Robot } from './robot';
 import { SimplexASTVisitor } from './simplexASTVisitor';
 import { SimplexParserVisitor } from './../simplex/gen/SimplexParserVisitor';
 import { SimulatorError } from './simulatorError';
@@ -28,7 +29,7 @@ export class AppComponent implements AfterViewInit {
 
   @ViewChild('canvas') editorContent: ElementRef;
 
-  private robot: PIXI.Sprite;
+  private robot: Robot;
   private app: PIXI.Application;
   private simplexErrorListener: SimplexErrorListener;
   private errors: any[];
@@ -51,6 +52,8 @@ export class AppComponent implements AfterViewInit {
       this.blocklyCode = window['blockly'].JavaScript.workspaceToCode(this.blocklyWorkspace);
       console.log(this.blocklyCode);
     });
+
+    this.robot = new Robot();
   }
 
   private compile() {
@@ -85,66 +88,31 @@ function print(message) {
   console.log('Program Output: ' + message);
 }
 
-function forward () {
-  ev3.x += 64;
-
-  /*let d = ev3.rotation * (180/Math.PI);
-  // console.log(d);
-  // ev3.x = ev3.x + (30 * Math.cos(d));
-
-  if (d > 360) {
-      const radians = 90 * (Math.PI/180);
-      ev3.rotation = radians;
-      d = 90;
-  }
-
-  if (d === 90) {
-    ev3.x += 30;
-  } else if (d === 180) {
-    ev3.y += 30;
-  } else if (d === 270) {
-    ev3.x -= 30;
-  } else if (d === 360 | d === 0) {
-    ev3.y -= 30;
-  }*/
+async function forward () {
+  await sleep(500);
+  robot.forward();
 }
 
-function back () {
-  ev3.x -= 64;
-
-  /*let d = ev3.rotation * (180/Math.PI);
-  console.log(d);
-  // ev3.x = ev3.x + (30 * Math.cos(d));
-  // ev3.x += 30;
-
-  if (d > 360) {
-      const radians = 90 * (Math.PI/180);
-      ev3.rotation = radians;
-      d = 90;
-  }
-
-  if (d === 90) {
-    ev3.x -= 30;
-  } else if (d === 180) {
-    ev3.y -= 30;
-  } else if (d === 270) {
-    ev3.x += 30;
-  } else if (d === 360 || d === 0) {
-    ev3.y += 30;
-  }*/
+async function back () {
+  await sleep(500);
+  robot.back();
 }
 
-function left () {
-  const radians = 90 * (Math.PI/180);
-  ev3.rotation -= radians;
+async function left () {
+  await sleep(500);
+  robot.left();
 }
 
-function right () {
-  const radians = 90 * (Math.PI/180);
-  ev3.rotation += radians;
+async function right () {
+  await sleep(500);
+  robot.right();
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }`;
 
-      this._simulation = new Function('ev3', 'SimulatorError', 'app', this.blocklyCode); // this.listener.emulationCode);
+      this._simulation = new Function('robot', 'SimulatorError', 'app', this.blocklyCode); // this.listener.emulationCode);
       const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.app);
     } catch (error) {
       console.log('error in sim: ' + error);
@@ -152,8 +120,7 @@ function right () {
   }
 
   public reset() {
-    this.robot.position.set(160, 160);
-    this.robot.rotation = 90 * (Math.PI / 180);
+    this.robot.reset();
   }
 
   ngAfterViewInit() {
@@ -162,16 +129,10 @@ function right () {
     const editor = this.editorContent.nativeElement;
     editor.appendChild(this.app.view);
 
-    this.robot = PIXI.Sprite.fromImage('./assets/cat.png');
-
     const landscapeSprite = PIXI.Sprite.fromImage('./assets/emulator-stay-center-background-2.png');
     this.app.stage.addChild(landscapeSprite);
 
-    this.robot.position.set(160, 160);
-    this.robot.anchor.set(0.5);
-    this.robot.rotation = 90 * (Math.PI / 180);
-
-    this.app.stage.addChild(this.robot);
+    this.app.stage.addChild(this.robot.robotSprite);
     const _this = this;
 
     this.app.ticker.add(function (delta) {
