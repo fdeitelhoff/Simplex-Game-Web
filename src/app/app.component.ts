@@ -86,7 +86,7 @@ function print(message) {
 }
 
 function forward () {
-  ev3.x += 30;
+  ev3.x += 64;
 
   /*let d = ev3.rotation * (180/Math.PI);
   // console.log(d);
@@ -110,7 +110,7 @@ function forward () {
 }
 
 function back () {
-  ev3.x -= 30;
+  ev3.x -= 64;
 
   /*let d = ev3.rotation * (180/Math.PI);
   console.log(d);
@@ -151,17 +151,25 @@ function right () {
     }
   }
 
+  public reset() {
+    this.robot.position.set(160, 160);
+    this.robot.rotation = 90 * (Math.PI / 180);
+  }
+
   ngAfterViewInit() {
-    this.app = new PIXI.Application(600, 600, {backgroundColor : 0x000000});
+    this.app = new PIXI.Application(640, 640, {backgroundColor : 0x000000});
 
     const editor = this.editorContent.nativeElement;
     editor.appendChild(this.app.view);
 
     this.robot = PIXI.Sprite.fromImage('./assets/cat.png');
 
-    this.robot.position.set(32, 32);
+    const landscapeSprite = PIXI.Sprite.fromImage('./assets/emulator-stay-center-background-2.png');
+    this.app.stage.addChild(landscapeSprite);
+
+    this.robot.position.set(160, 160);
     this.robot.anchor.set(0.5);
-    this.robot.rotation += 90 * (Math.PI / 180);
+    this.robot.rotation = 90 * (Math.PI / 180);
 
     this.app.stage.addChild(this.robot);
     const _this = this;
