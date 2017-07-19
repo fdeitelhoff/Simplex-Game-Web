@@ -80,33 +80,62 @@ function print(message) {
 }
 
 function forward () {
-  const d = ev3.rotation * (180/Math.PI);
-  // console.log(d);
   ev3.x += 30;
 
-  /*if (d === 90) {
+  /*let d = ev3.rotation * (180/Math.PI);
+  // console.log(d);
+  // ev3.x = ev3.x + (30 * Math.cos(d));
+
+  if (d > 360) {
+      const radians = 90 * (Math.PI/180);
+      ev3.rotation = radians;
+      d = 90;
+  }
+
+  if (d === 90) {
     ev3.x += 30;
   } else if (d === 180) {
     ev3.y += 30;
   } else if (d === 270) {
     ev3.x -= 30;
-  } else if (d === 360) {
+  } else if (d === 360 | d === 0) {
     ev3.y -= 30;
   }*/
 }
 
 function back () {
   ev3.x -= 30;
+
+  /*let d = ev3.rotation * (180/Math.PI);
+  console.log(d);
+  // ev3.x = ev3.x + (30 * Math.cos(d));
+  // ev3.x += 30;
+
+  if (d > 360) {
+      const radians = 90 * (Math.PI/180);
+      ev3.rotation = radians;
+      d = 90;
+  }
+
+  if (d === 90) {
+    ev3.x -= 30;
+  } else if (d === 180) {
+    ev3.y -= 30;
+  } else if (d === 270) {
+    ev3.x += 30;
+  } else if (d === 360 || d === 0) {
+    ev3.y += 30;
+  }*/
 }
 
 function left () {
   const radians = 90 * (Math.PI/180);
-  ev3.rotation += radians;
+  ev3.rotation -= radians;
 }
 
 function right () {
   const radians = 90 * (Math.PI/180);
-  ev3.rotation -= radians;
+  ev3.rotation += radians;
 }`;
 
       this._simulation = new Function('ev3', 'SimulatorError', 'app', this.blocklyCode); // this.listener.emulationCode);
@@ -133,6 +162,7 @@ function right () {
 
     this.app.ticker.add(function (delta) {
       // _this.cat.x += 1;
+      // console.log(_this.robot.direction);
 
     });
   }
