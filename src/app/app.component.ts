@@ -33,6 +33,9 @@ export class AppComponent implements AfterViewInit {
   private robot: Robot;
   private app: PIXI.Application;
   private emulation: Emulation;
+
+  private emulationStatus: string;
+
   private simplexErrorListener: SimplexErrorListener;
   private errors: any[];
   private _dataService: DataService;
@@ -84,8 +87,14 @@ export class AppComponent implements AfterViewInit {
     // console.log(window['workspace']);
   }
 
+  public finish() {
+    this.emulationStatus = 'Finished!';
+  }
+
   public run() {
     try {
+      this.emulationStatus = 'Running...';
+
       let emulatorCode = 'async function emulator() {\n';
 
       emulatorCode += this.blocklyCode;
@@ -127,7 +136,7 @@ function sleep(ms) {
 }
 
 async function finish() {
-  console.log('finish');
+  container.finish();
 }
 
 }
@@ -136,8 +145,8 @@ emulator();`;
 
   console.log(emulatorCode);
 
-      this._simulation = new Function('robot', 'SimulatorError', 'emulation', emulatorCode); // this.listener.emulationCode);
-      const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.emulation);
+      this._simulation = new Function('robot', 'SimulatorError', 'emulation', 'container', emulatorCode); // this.listener.emulationCode);
+      const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.emulation, this);
     } catch (error) {
       console.log('error in sim: ' + error);
     }
