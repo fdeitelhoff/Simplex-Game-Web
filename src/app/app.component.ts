@@ -50,7 +50,6 @@ export class AppComponent implements AfterViewInit {
     this.blocklyWorkspace = window['workspace'];
     this.blocklyWorkspace.addChangeListener((event: any) => {
       this.blocklyCode = window['blockly'].JavaScript.workspaceToCode(this.blocklyWorkspace);
-      console.log(this.blocklyCode);
     });
 
     this.robot = new Robot();
@@ -83,7 +82,11 @@ export class AppComponent implements AfterViewInit {
 
   public run() {
     try {
-    this.blocklyCode += `\n
+      let emulatorCode = 'async function emulator() {\n';
+
+      emulatorCode += this.blocklyCode;
+
+      emulatorCode += `\n
 function print(message) {
   console.log('Program Output: ' + message);
 }
@@ -108,11 +111,22 @@ async function right () {
   robot.right();
 }
 
+async function readSensor () {
+  await sleep(500);
+  return 'Sensor Value';
+}
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}`;
+}
 
-      this._simulation = new Function('robot', 'SimulatorError', 'app', this.blocklyCode); // this.listener.emulationCode);
+}
+
+emulator();`;
+
+  console.log(emulatorCode);
+
+      this._simulation = new Function('robot', 'SimulatorError', 'app', emulatorCode); // this.listener.emulationCode);
       const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.app);
     } catch (error) {
       console.log('error in sim: ' + error);

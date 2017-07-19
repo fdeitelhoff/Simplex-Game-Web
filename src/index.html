@@ -30,6 +30,7 @@
     <block type="back"></block>
     <block type="left"></block>
     <block type="right"></block>
+    <block type="readSensor"></block>
   </xml>
 
 <script>
@@ -91,31 +92,50 @@
     }
   };
 
+  Blockly.Blocks['readSensor'] = {
+    init: function() {
+      this.jsonInit({
+        "type": "readSensor",
+        "message0": "readSensor",
+        "inputsInline": false,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 210,
+        "helpUrl": ""
+      });
+    }
+  };
+
   Blockly.JavaScript['forward'] = function(block) {
     var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
     const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
-    var code = 'forward(' + steps + ');\n';
+    var code = 'await forward(' + steps + ');\n';
     return code;
   };
 
   Blockly.JavaScript['back'] = function(block) {
     var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
     const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
-    var code = 'back(' + steps + ');\n';
+    var code = 'await back(' + steps + ');\n';
     return code;
   };
 
   Blockly.JavaScript['left'] = function(block) {
     var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
     const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
-    var code = 'left(' + steps + ');\n';
+    var code = 'await left(' + steps + ');\n';
     return code;
   };
 
   Blockly.JavaScript['right'] = function(block) {
     var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
     const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
-    var code = 'right(' + steps + ');\n';
+    var code = 'await right(' + steps + ');\n';
+    return code;
+  };
+
+  Blockly.JavaScript['readSensor'] = function(block) {
+    var code = 'let v = await readSensor();\nconsole.log(v);\n';
     return code;
   };
 
