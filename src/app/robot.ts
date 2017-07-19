@@ -10,6 +10,8 @@ enum Direction {
 export class Robot {
   public robotSprite: PIXI.Sprite;
   private viewDirection: Direction;
+  public x: number;
+  public y: number;
 
   constructor() {
     this.robotSprite = PIXI.Sprite.fromImage('./assets/cat.png');
@@ -23,29 +25,40 @@ export class Robot {
     this.robotSprite.rotation = 90 * (Math.PI / 180);
 
     this.viewDirection = Direction.East;
+
+    this.x = 3;
+    this.y = 3;
   }
 
   public forward () {
     if (this.viewDirection === Direction.North) {
       this.robotSprite.y -= 64;
+      this.y -= 1;
     } else if (this.viewDirection === Direction.East) {
       this.robotSprite.x += 64;
+      this.x += 1;
     } else if (this.viewDirection === Direction.South) {
       this.robotSprite.y += 64;
+      this.y += 1;
     } else if (this.viewDirection === Direction.West) {
       this.robotSprite.x -= 64;
+      this.x -= 1;
     }
   }
 
   public back() {
     if (this.viewDirection === Direction.North) {
       this.robotSprite.y += 64;
+      this.y += 1;
     } else if (this.viewDirection === Direction.East) {
       this.robotSprite.x -= 64;
+      this.x -= 1;
     } else if (this.viewDirection === Direction.South) {
       this.robotSprite.y -= 64;
+      this.y -= 1;
     } else if (this.viewDirection === Direction.West) {
       this.robotSprite.x += 64;
+      this.x += 1;
     }
   }
 

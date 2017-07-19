@@ -16,6 +16,7 @@ import * as PIXI from 'pixi.js';
 import { Subscription } from 'rxjs/Subscription';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { Emulation } from 'app/emulation';
 
 // import { Blockly } from 'node-blockly';
 
@@ -31,6 +32,7 @@ export class AppComponent implements AfterViewInit {
 
   private robot: Robot;
   private app: PIXI.Application;
+  private emulation: Emulation;
   private simplexErrorListener: SimplexErrorListener;
   private errors: any[];
   private _dataService: DataService;
@@ -53,6 +55,8 @@ export class AppComponent implements AfterViewInit {
     });
 
     this.robot = new Robot();
+
+    this.emulation = new Emulation();
   }
 
   private compile() {
@@ -86,6 +90,8 @@ export class AppComponent implements AfterViewInit {
 
       emulatorCode += this.blocklyCode;
 
+      emulatorCode += '\nawait finish();';
+
       emulatorCode += `\n
 function print(message) {
   console.log('Program Output: ' + message);
@@ -113,11 +119,15 @@ async function right () {
 
 async function readSensor () {
   await sleep(500);
-  return 'Sensor Value';
+  return emulation.readColorSensorValue(robot.x, robot.y);
 }
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function finish() {
+  console.log('finish');
 }
 
 }
@@ -126,8 +136,8 @@ emulator();`;
 
   console.log(emulatorCode);
 
-      this._simulation = new Function('robot', 'SimulatorError', 'app', emulatorCode); // this.listener.emulationCode);
-      const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.app);
+      this._simulation = new Function('robot', 'SimulatorError', 'emulation', emulatorCode); // this.listener.emulationCode);
+      const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.emulation);
     } catch (error) {
       console.log('error in sim: ' + error);
     }
