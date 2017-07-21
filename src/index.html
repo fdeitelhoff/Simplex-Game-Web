@@ -345,7 +345,7 @@
     init: function() {
       this.jsonInit({
         "type": "forward",
-        "message0": "forward",
+        "message0": "stepForward",
         "inputsInline": false,
         "previousStatement": null,
         "nextStatement": null,
@@ -359,7 +359,7 @@
     init: function() {
       this.jsonInit({
         "type": "back",
-        "message0": "back",
+        "message0": "stepBack",
         "inputsInline": false,
         "previousStatement": null,
         "nextStatement": null,
@@ -373,7 +373,7 @@
     init: function() {
       this.jsonInit({
         "type": "left",
-        "message0": "left",
+        "message0": "turnLeft",
         "inputsInline": false,
         "previousStatement": null,
         "nextStatement": null,
@@ -387,7 +387,7 @@
     init: function() {
       this.jsonInit({
         "type": "right",
-        "message0": "right",
+        "message0": "turnRight",
         "inputsInline": false,
         "previousStatement": null,
         "nextStatement": null,
@@ -401,8 +401,8 @@
     init: function() {
       this.jsonInit({
         "type": "readsensor",
-        "message0": "readSensor",
-        "output": null,
+        "message0": "getColorSensorValue",
+        "output": "Number",
         "colour": 230,
         "tooltip": "",
         "helpUrl": ""
@@ -439,8 +439,7 @@
   };
 
   Blockly.JavaScript['readSensor'] = function(block) {
-    var code = 'let v = await readSensor();\nconsole.log(v);\n';
-    return code;
+    return ['await readSensor()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
   };
 
   window.workspace = Blockly.inject('blocklyDiv',

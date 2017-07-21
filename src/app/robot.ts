@@ -26,8 +26,8 @@ export class Robot {
 
     this.viewDirection = Direction.East;
 
-    this.x = 3;
-    this.y = 3;
+    this.x = 2;
+    this.y = 2;
   }
 
   public forward () {
@@ -90,5 +90,21 @@ export class Robot {
     } else if (this.viewDirection === Direction.West) {
       this.viewDirection = Direction.North;
     }
+  }
+
+  public getColorSensorPosition(): [number, number] {
+    let position;
+
+    if (this.viewDirection === Direction.North) {
+      position = [this.x, this.y - 1];
+    } else if (this.viewDirection === Direction.East) {
+      position = [this.x + 1, this.y];
+    } else if (this.viewDirection === Direction.South) {
+      position = [this.x, this.y + 1];
+    } else if (this.viewDirection === Direction.West) {
+      position = [this.x - 1, this.y];
+    }
+
+    return position;
   }
 }

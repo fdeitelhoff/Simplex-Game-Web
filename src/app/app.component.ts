@@ -46,6 +46,10 @@ export class AppComponent implements AfterViewInit {
   private blocklyWorkspace: any;
   private blocklyCode: string;
 
+  private graphics: PIXI.Graphics;
+  private emulationGrid: Map<number, Map<number, PIXI.Graphics>>;
+  private isGridVisible: boolean;
+
   constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
     this._dataService = dataService;
@@ -60,6 +64,8 @@ export class AppComponent implements AfterViewInit {
     this.robot = new Robot();
 
     this.emulation = new Emulation();
+    this.emulationGrid = new Map();
+    this.isGridVisible = false;
   }
 
   private compile() {
@@ -127,8 +133,19 @@ async function right () {
 }
 
 async function readSensor () {
-  await sleep(500);
-  return emulation.readColorSensorValue(robot.x, robot.y);
+  const position = robot.getColorSensorPosition();
+
+  await sleep(400);
+
+  container.highlightSensorRead(position[0], position[1]);
+
+  const colorSensorValue = emulation.readColorSensorValue(position[0], position[1]);
+
+  await sleep(300);
+
+  container.removeSensorRead();
+
+  return colorSensorValue;
 }
 
 function sleep(ms) {
@@ -136,6 +153,7 @@ function sleep(ms) {
 }
 
 async function finish() {
+  await sleep(500);
   container.finish();
 }
 
@@ -152,6 +170,60 @@ emulator();`;
     }
   }
 
+  public highlightSensorRead(x: number, y: number) {
+    // console.log(`x:${x} y:${y}`);
+
+    this.graphics = new PIXI.Graphics();
+    this.graphics.lineStyle(2, 0xFF0000);
+    this.graphics.drawRect(x * 64, y * 64, 64, 64);
+    this.app.stage.addChild(this.graphics);
+  }
+
+  private toggleGrid() {
+    if (this.isGridVisible) {
+      this.removeGrid();
+    } else {
+      this.drawGrid();
+    }
+
+    this.isGridVisible = !this.isGridVisible;
+  }
+
+  public drawGrid() {
+    if (this.emulationGrid.size === 0) {
+      for (let x = 0; x <= 9; x++) {
+        this.emulationGrid.set(x, new Map());
+
+        for (let y = 0; y <= 9; y++) {
+          const graphics = new PIXI.Graphics();
+          graphics.lineStyle(1, 0x000000);
+          graphics.drawRect(x * 64, y * 64, 64, 64);
+          this.app.stage.addChild(graphics);
+
+          this.emulationGrid.get(x).set(y, graphics);
+        }
+      }
+    } else {
+      for (let x = 0; x <= 9; x++) {
+        for (let y = 0; y <= 9; y++) {
+          this.app.stage.addChild(this.emulationGrid.get(x).get(y));
+        }
+      }
+    }
+  }
+
+  private removeGrid() {
+    for (let x = 0; x <= 9; x++) {
+      for (let y = 0; y <= 9; y++) {
+        this.app.stage.removeChild(this.emulationGrid.get(x).get(y));
+      }
+    }
+  }
+
+  public removeSensorRead() {
+    this.app.stage.removeChild(this.graphics);
+  }
+
   public reset() {
     this.robot.reset();
   }
@@ -166,13 +238,6 @@ emulator();`;
     this.app.stage.addChild(landscapeSprite);
 
     this.app.stage.addChild(this.robot.robotSprite);
-    const _this = this;
-
-    this.app.ticker.add(function (delta) {
-      // _this.cat.x += 1;
-      // console.log(_this.robot.direction);
-
-    });
 
     const blocklyDiv = document.getElementById('blocklyDiv');
     const blocklyDiv2 = document.getElementById('blocklyDiv2');
