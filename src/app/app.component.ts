@@ -289,6 +289,17 @@ emulator().catch(function(error) {
     this.emulationStatus = 'Reset...';
   }
 
+  public exportUserProgram() {
+    const xmlDom = window['blockly'].Xml.workspaceToDom(window['blockly'].mainWorkspace);
+
+  }
+
+  public importUserProgram() {
+    /* var dom = Blockly.Xml.textToDom(xml);
+    Blockly.mainWorkspace.clear();
+    Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);*/
+  }
+
   ngAfterViewInit() {
     this.app = new PIXI.Application(640, 640, {backgroundColor : 0x000000});
 
