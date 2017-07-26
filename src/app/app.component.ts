@@ -15,8 +15,11 @@ import { SimplexParser } from './../simplex/gen/SimplexParser';
 import * as PIXI from 'pixi.js';
 import { Subscription } from 'rxjs/Subscription';
 
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Emulation } from 'app/emulation';
+
+// const fs = require('fs');
+// import * as fs from 'fs';
 
 // import { Blockly } from 'node-blockly';
 
@@ -49,6 +52,10 @@ export class AppComponent implements AfterViewInit {
   private graphics: PIXI.Graphics;
   private emulationGrid: Map<number, Map<number, PIXI.Graphics>>;
   private isGridVisible: boolean;
+  private ultrasonicVisualization: PIXI.Graphics[];
+
+  public cancel: boolean;
+  private predefinedEmulatorCode: string;
 
   constructor(private dataService: DataService) {
     this.simplexErrorListener = new SimplexErrorListener();
@@ -66,6 +73,14 @@ export class AppComponent implements AfterViewInit {
     this.emulation = new Emulation();
     this.emulationGrid = new Map();
     this.isGridVisible = false;
+
+    this.ultrasonicVisualization = [];
+
+    this.predefinedEmulatorCode = '';
+
+    /*fs.readFile('./emulatorCode.txt', 'utf8', function(err, data) {
+      console.log(data)
+    });*/
   }
 
   private compile() {
@@ -98,85 +113,121 @@ export class AppComponent implements AfterViewInit {
   }
 
   public run() {
-    try {
-      this.emulationStatus = 'Running...';
+    this.emulationStatus = 'Running...';
 
-      let emulatorCode = 'async function emulator() {\n';
+    let emulatorCode = 'async function emulator() {\n';
 
-      emulatorCode += this.blocklyCode;
+    emulatorCode += this.blocklyCode;
 
-      emulatorCode += '\nawait finish();';
+    emulatorCode += '\nawait finish();';
 
-      emulatorCode += `\n
-function print(message) {
-  console.log('Program Output: ' + message);
-}
+    emulatorCode += `
+  async function forward () {
+    await sleep(500);
+    robot.forward();
+  }
 
-async function forward () {
-  await sleep(500);
-  robot.forward();
-}
+  async function back () {
+    await sleep(500);
+    robot.back();
+  }
 
-async function back () {
-  await sleep(500);
-  robot.back();
-}
+  async function left () {
+    await sleep(500);
+    robot.left();
+  }
 
-async function left () {
-  await sleep(500);
-  robot.left();
-}
+  async function right () {
+    await sleep(500);
+    robot.right();
+  }
 
-async function right () {
-  await sleep(500);
-  robot.right();
-}
+  async function readSensor () {
+    const position = robot.getColorSensorPosition();
 
-async function readSensor () {
-  const position = robot.getColorSensorPosition();
+    await sleep(400);
 
-  await sleep(400);
+    container.highlightSensorRead(position[0], position[1]);
 
-  container.highlightSensorRead(position[0], position[1]);
+    const colorSensorValue = emulation.readColorSensorValue(position[0], position[1]);
 
-  const colorSensorValue = emulation.readColorSensorValue(position[0], position[1]);
+    await sleep(300);
 
-  await sleep(300);
+    container.removeSensorRead();
 
-  container.removeSensorRead();
+    return colorSensorValue;
+  }
 
-  return colorSensorValue;
-}
+  async function readUltrasonicSensor () {
+    const position = robot.getUltrasonicSensorPosition();
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+    await sleep(400);
 
-async function finish() {
-  await sleep(500);
-  container.finish();
-}
+    container.highlightUltrasonicSensorRead(position[0], position[1]);
 
-}
+    const ultrasonicSensorValues = emulation.readUltrasonicSensorValue(position[0], position[1]);
+    console.log(ultrasonicSensorValues);
+    await sleep(300);
 
-emulator();`;
+    container.removeSensorRead();
 
-  console.log(emulatorCode);
+    return ultrasonicSensorValues;
+  }
 
-      this._simulation = new Function('robot', 'SimulatorError', 'emulation', 'container', emulatorCode); // this.listener.emulationCode);
-      const t = this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.emulation, this);
-    } catch (error) {
-      console.log('error in sim: ' + error);
+  function sleep(ms) {
+    if (container.cancel) {
+      throw new Error('Emulation is canceled...');
     }
+
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function finish() {
+    await sleep(500);
+    container.finish();
+  }
+}
+
+emulator().catch(function(error) {
+  container.cancelEmulation();
+});`;
+
+    console.log(emulatorCode);
+
+    this._simulation = new Function('robot', 'SimulatorError', 'emulation', 'container', emulatorCode); // this.listener.emulationCode);
+
+    this.cancel = false;
+
+    this._simulation(this.robot, new SimulatorError('<No Message Provided!>'), this.emulation, this);
   }
 
   public highlightSensorRead(x: number, y: number) {
-    // console.log(`x:${x} y:${y}`);
-
     this.graphics = new PIXI.Graphics();
     this.graphics.lineStyle(2, 0xFF0000);
     this.graphics.drawRect(x * 64, y * 64, 64, 64);
     this.app.stage.addChild(this.graphics);
+  }
+
+  public highlightUltrasonicSensorRead(x: number, y: number) {
+    this.ultrasonicVisualization[0] = new PIXI.Graphics();
+    this.ultrasonicVisualization[0].lineStyle(2, 0xFF0000);
+    this.ultrasonicVisualization[0].drawRect(x * 64, y * 64, 64, 64);
+    this.app.stage.addChild(this.ultrasonicVisualization[0]);
+
+    this.ultrasonicVisualization[1] = new PIXI.Graphics();
+    this.ultrasonicVisualization[1].lineStyle(2, 0xFF0000);
+    this.ultrasonicVisualization[1].drawRect(x * 64, (y - 1) * 64, 64, 64);
+    this.app.stage.addChild(this.ultrasonicVisualization[1]);
+
+    this.ultrasonicVisualization[2] = new PIXI.Graphics();
+    this.ultrasonicVisualization[2].lineStyle(2, 0xFF0000);
+    this.ultrasonicVisualization[2].drawRect(x * 64, (y + 1) * 64, 64, 64);
+    this.app.stage.addChild(this.ultrasonicVisualization[2]);
+
+    this.ultrasonicVisualization[3] = new PIXI.Graphics();
+    this.ultrasonicVisualization[3].lineStyle(2, 0xFF0000);
+    this.ultrasonicVisualization[3].drawRect((x + 1) * 64, y * 64, 64, 64);
+    this.app.stage.addChild(this.ultrasonicVisualization[3]);
   }
 
   private toggleGrid() {
@@ -222,10 +273,20 @@ emulator();`;
 
   public removeSensorRead() {
     this.app.stage.removeChild(this.graphics);
+
+    for (let i = 0; i < this.ultrasonicVisualization.length; i++) {
+      this.app.stage.removeChild(this.ultrasonicVisualization[i]);
+    }
   }
 
   public reset() {
+    this.cancel = true;
+    this.cancelEmulation();
+  }
+
+  public cancelEmulation() {
     this.robot.reset();
+    this.emulationStatus = 'Reset...';
   }
 
   ngAfterViewInit() {

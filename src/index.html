@@ -332,6 +332,7 @@
       <block type="left"></block>
       <block type="right"></block>
       <block type="readSensor"></block>
+      <block type="readUltrasonicSensor"></block>
     </category>
     <sep></sep>
     <category name="Variablen" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
@@ -410,6 +411,19 @@
     }
   };
 
+  Blockly.Blocks['readUltrasonicSensor'] = {
+    init: function() {
+      this.jsonInit({
+        "type": "readUltrasonicSensor",
+        "message0": "readUltrasonicSensor",
+        "output": "Number",
+        "colour": 230,
+        "tooltip": "",
+        "helpUrl": ""
+      });
+    }
+  };
+
   Blockly.JavaScript['forward'] = function(block) {
     var value_steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ATOMIC);
     const steps = Blockly.JavaScript.valueToCode(block, 'steps', Blockly.JavaScript.ORDER_ADDITION) || '0';
@@ -440,6 +454,10 @@
 
   Blockly.JavaScript['readSensor'] = function(block) {
     return ['await readSensor()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+  };
+
+  Blockly.JavaScript['readUltrasonicSensor'] = function(block) {
+    return ['await readUltrasonicSensor()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
   };
 
   window.workspace = Blockly.inject('blocklyDiv',

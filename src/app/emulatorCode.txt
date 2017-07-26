@@ -1,0 +1,86 @@
+async function emulator(cancel) {
+  let error = false;
+
+  try {
+    await forward();
+    await back();
+    // await finish();
+  } catch (e) {
+    // throw e;
+    // console.log('t');
+    error = true;
+  } finally {
+    await finish(error);
+  }
+
+
+  function print(message) {
+    console.log('Program Output: ' + message);
+  }
+
+  async function forward() {
+    if (cancel) {
+      throw new Error('test');
+    }
+
+    await sleep(500);
+
+    console.log('forward');
+  }
+
+  async function back() {
+    if (cancel) {
+      throw new Error('test');
+    }
+
+    await sleep(500);
+    console.log('back');
+  }
+
+  async function left() {
+    if (cancel) {
+      throw new Error('test');
+    }
+
+    await sleep(500);
+    console.log('back');
+  }
+
+  async function right() {
+    if (cancel) {
+      throw new Error('test');
+    }
+
+    await sleep(500);
+    console.log('back');
+  }
+
+  async function readSensor() {
+    if (cancel) {
+      throw new Error('test');
+    }
+
+    await sleep(400);
+
+    console.log('read sensor position');
+
+    await sleep(300);
+
+    console.log('return color sensor value');
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function finish(error) {
+    await sleep(500);
+    console.log('finish: ' + error);
+  }
+}
+
+try {
+  emulator(false);
+} catch (e) {
+  console.log(e);
+}
