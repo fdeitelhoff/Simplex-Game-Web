@@ -11,27 +11,12 @@
 <script src="assets/blockly_compressed.js"></script>
 <script src="assets/blocks_compressed.js"></script>
 <script src="assets/javascript_compressed.js"></script>
-<script src="assets/msg/js/en.js"></script>
+<script src="assets/msg/js/de.js"></script>
 </head>
 <body>
   <div id="blocklyDiv" #blocklyDiv style="height: 900px; width: 880px;"></div>
   <!-- <sapt-monaco-editor>Editor...</sapt-monaco-editor> -->
   <sapt-root></sapt-root>
-
-  <!--<xml id="toolbox" style="display: none">
-    <block type="controls_if"></block>
-    <block type="controls_repeat_ext"></block>
-    <block type="logic_compare"></block>
-    <block type="math_number"></block>
-    <block type="math_arithmetic"></block>
-    <block type="text"></block>
-    <block type="text_print"></block>
-    <block type="forward"></block>
-    <block type="back"></block>
-    <block type="left"></block>
-    <block type="right"></block>
-    <block type="readSensor"></block>
-  </xml>-->
 
   <xml id="toolbox" style="display: none">
     <category name="Logik" colour="%{BKY_LOGIC_HUE}">
@@ -235,7 +220,7 @@
           </shadow>
         </value>
       </block>
-    </category>-->
+    </category>
     <category name="Listen" colour="%{BKY_LISTS_HUE}">
       <block type="lists_create_with">
         <mutation items="0"></mutation>
@@ -324,9 +309,9 @@
           </shadow>
         </value>
       </block>
-    </category>
+    </category>-->
     <sep></sep>
-    <category name="Roboter">
+    <category name="Roboter" colour="%{BKY_COLOUR_HUE}">
       <block type="forward"></block>
       <block type="back"></block>
       <block type="left"></block>

@@ -49,6 +49,12 @@ export class AppComponent implements AfterViewInit {
   private blocklyWorkspace: any;
   private blocklyCode: string;
 
+  private taskText: string;
+  private taskDoneText: string;
+
+  private currentTask: number;
+  private maxTasks: number;
+
   private graphics: PIXI.Graphics;
   private emulationGrid: Map<number, Map<number, PIXI.Graphics>>;
   private isGridVisible: boolean;
@@ -78,9 +84,18 @@ export class AppComponent implements AfterViewInit {
 
     this.predefinedEmulatorCode = '';
 
+    this.taskText = `<p>In der ersten Aufgabe geht es darum, die Motoren unseres Roboters
+ <i>Wats<font color="#cc0000">3</font>n</i> zu testen.</p>
+ <p>Um die Aufgabe erfolgreich abzuschließen, fahre bitte mit <i>Wats<font color="#cc0000">3</font>n</i>
+ <strong>vier Schritte nach vorne</strong> und wieder <strong>vier Schritte zurück</strong>, um an die Ausgangsposition zu gelangen.</p>
+ <p>Wenn du fertig bist oder nicht weiter kommst, klicke bitte auf die Schaltfläche <strong>nächste Aufgabe</strong>.</p>`;
     /*fs.readFile('./emulatorCode.txt', 'utf8', function(err, data) {
       console.log(data)
     });*/
+
+    this.taskDoneText = 'nächste Aufgabe';
+    this.currentTask = 1;
+    this.maxTasks = 2;
   }
 
   private compile() {
@@ -108,11 +123,9 @@ export class AppComponent implements AfterViewInit {
     // console.log(window['workspace']);
   }
 
-  public finish() {
-    this.emulationStatus = 'Finished!';
-  }
-
   public run() {
+    this.reset();
+
     this.emulationStatus = 'Running...';
 
     let emulatorCode = 'async function emulator() {\n';
@@ -192,7 +205,7 @@ emulator().catch(function(error) {
   container.cancelEmulation();
 });`;
 
-    console.log(emulatorCode);
+    // console.log(emulatorCode);
 
     this._simulation = new Function('robot', 'SimulatorError', 'emulation', 'container', emulatorCode); // this.listener.emulationCode);
 
@@ -287,6 +300,33 @@ emulator().catch(function(error) {
   public cancelEmulation() {
     this.robot.reset();
     this.emulationStatus = 'Reset...';
+  }
+
+  public finish() {
+    this.emulationStatus = 'Finished!';
+
+    if (this.currentTask === 1) {
+      if (this.robot.x === 2 && this.robot.y === 2 && this.robot.movedForward === 4 && this.robot.movedBackward === 4) {
+        console.log('hurra');
+      }
+    }
+  }
+
+  public taskDone() {
+    if (this.currentTask === 1) {
+      this.currentTask = 2;
+
+      this.taskDoneText = 'Fertig';
+      this.taskText = `<p>In der zweite Aufgabe geht es darum, die Steuerung unseres Roboters
+      <i>Wats<font color="#cc0000">3</font>n</i> zu testen.</p>
+      <p>Um die Aufgabe erfolgreich abzuschließen, fahre bitte mit <i>Wats<font color="#cc0000">3</font>n</i>
+      <strong>ein Quadrat</strong>. Der Roboter soll nach Abschluss des Quadrats wieder auf der Ausgangsposition stehen.
+      Wie groß das Quadrat ist und in welche Richtung du fährst, bleibt dir überlassen.</p>
+      <p>Wenn du fertig bist oder nicht weiter kommst, klicke bitte auf die Schaltfläche <strong>Fertig</strong>.</p>`;
+
+    } else if (this.currentTask === 2) {
+      alert('alles fertig, hurra!');
+    }
   }
 
   public exportUserProgram() {

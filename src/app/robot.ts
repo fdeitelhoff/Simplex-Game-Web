@@ -13,6 +13,11 @@ export class Robot {
   public x: number;
   public y: number;
 
+  public movedForward: number;
+  public movedBackward: number;
+  public movedLeft: number;
+  public movedRight: number;
+
   constructor() {
     this.robotSprite = PIXI.Sprite.fromImage('./assets/cat.png');
 
@@ -28,6 +33,11 @@ export class Robot {
 
     this.x = 2;
     this.y = 2;
+
+    this.movedBackward = 0;
+    this.movedForward = 0;
+    this.movedLeft = 0;
+    this.movedRight = 0;
   }
 
   public forward () {
@@ -44,6 +54,8 @@ export class Robot {
       this.robotSprite.x -= 64;
       this.x -= 1;
     }
+
+    this.movedForward++;
   }
 
   public back() {
@@ -60,6 +72,8 @@ export class Robot {
       this.robotSprite.x += 64;
       this.x += 1;
     }
+
+    this.movedBackward++;
   }
 
   public left() {
@@ -75,6 +89,8 @@ export class Robot {
     } else if (this.viewDirection === Direction.West) {
       this.viewDirection = Direction.South;
     }
+
+    this.movedLeft++;
   }
 
   public right() {
@@ -90,6 +106,8 @@ export class Robot {
     } else if (this.viewDirection === Direction.West) {
       this.viewDirection = Direction.North;
     }
+
+    this.movedRight++;
   }
 
   public getColorSensorPosition(): [number, number] {
