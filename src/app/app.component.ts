@@ -24,7 +24,7 @@ import { Emulation } from 'app/emulation';
 // import { Blockly } from 'node-blockly';
 
 @Component({
-  selector: 'sapt-root',
+  // selector: 'sapt-root',
   templateUrl: './app.component.html',
   styles: []
 })
@@ -116,7 +116,8 @@ export class AppComponent implements AfterViewInit {
     const result = parser.simplex();
     this.listener = new SimplexASTListener();
 
-    ParseTreeWalker.DEFAULT.walk(this.listener, result);
+    // Commenting out due to errors.
+    // ParseTreeWalker.DEFAULT.walk(this.listener, result);
     this.errors = this.simplexErrorListener.errors;
 
     // const visitor = new SimplexASTVisitor();

@@ -16,7 +16,9 @@
 <body>
   <div id="blocklyDiv" #blocklyDiv style="height: 650px; width: 900px;"></div>
   <!-- <sapt-monaco-editor>Editor...</sapt-monaco-editor> -->
-  <sapt-root></sapt-root>
+
+  <router-outlet></router-outlet>
+  <!-- <sapt-root></sapt-root>-->
 
   <xml id="toolbox" style="display: none">
     <category name="Logik" colour="%{BKY_LOGIC_HUE}">
