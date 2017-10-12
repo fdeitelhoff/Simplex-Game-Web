@@ -1,9 +1,24 @@
 <!-- <ngb-pagination [collectionSize]="40" [(page)]="page"></ngb-pagination>-->
 
 <div class="container">
-  <div class="row"> <!-- style="border: 2px solid black;">-->
-    <div class="col-7"> <!--style="border: 2px solid green;">-->
+  <div class="row">
+    <div class="col-7">
       <div id="blocklyDiv2" #blocklyDiv></div>
+      <div style="height: 235px;">
+        <h6 style="margin-top: 10px;">Hilfe</h6>
+        <p>
+          Der Blockly-Editor (siehe oben) besteht aus zwei Bereichen. Links die Kategorien mit den verfügbaren Blöcken und rechts die Programmierfläche. Du kannst eine Kategorie anklicken,
+          einen Block auswählen und auf die Programmierfläche ziehen.
+        </p>
+        <p>
+          Über die Schaltfläche <strong>Ausführen</strong> wird ein Programm ausgeführt und dein Roboter führt die Aktionen aus. Die Auswahlbox <strong>Grid anzeigen</strong> zeigt das Spielfeldraster an.
+          Dadurch kannst du sehen, wie groß ein Schritt deines Roboters ist. Die Auswahlbox <strong>Kartendaten anzeigen</strong> zeigt dir die Werte der einzelnen Felder an. Die brauchst du,
+          um sie mit dem Farbsensor auszulesen.
+        </p>
+        <p>
+          Bei jedem neuen Durchlauf wird dein Roboter zunächst auf die Ausgangsposition zurückgesetzt.
+        </p>
+      </div>
     </div>
     <div class="col-5"> <!--style="border: 2px solid yellow;">-->
       <div class="row"> <!--style="border: 2px solid brown;">-->
@@ -46,6 +61,8 @@
           {{ emulationStatus }}
           <input type="checkbox" name="toggleGrid" id="toggleGrid" (change)="toggleGrid()">
           <label for="toggleGrid">Grid anzeigen</label>
+          <input type="checkbox" name="toggleMapData" id="toggleMapData" (change)="toggleMapData()">
+          <label for="toggleMapData">Kartendaten anzeigen</label>
           <button (click)="taskDone()">{{ taskDoneText }}</button>
         </div>
       </div>

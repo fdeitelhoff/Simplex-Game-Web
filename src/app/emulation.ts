@@ -1,5 +1,5 @@
 export class Emulation {
-  private colorMapData: number[][];
+  public colorMapData: number[][];
   private ultrasonicMapData: number[][];
 
   constructor() {

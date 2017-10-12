@@ -58,6 +58,8 @@ export class AppComponent implements AfterViewInit {
   private graphics: PIXI.Graphics;
   private emulationGrid: Map<number, Map<number, PIXI.Graphics>>;
   private isGridVisible: boolean;
+  private mapDataGrid: Map<number, Map<number, PIXI.Graphics>>;
+  private isMapDataVisible: boolean;
   private ultrasonicVisualization: PIXI.Graphics[];
 
   public cancel: boolean;
@@ -79,6 +81,8 @@ export class AppComponent implements AfterViewInit {
     this.emulation = new Emulation();
     this.emulationGrid = new Map();
     this.isGridVisible = false;
+    this.mapDataGrid = new Map();
+    this.isMapDataVisible = false;
 
     this.ultrasonicVisualization = [];
 
@@ -95,7 +99,7 @@ export class AppComponent implements AfterViewInit {
 
     this.taskDoneText = 'nächste Aufgabe';
     this.currentTask = 1;
-    this.maxTasks = 2;
+    this.maxTasks = 3;
   }
 
   private compile() {
@@ -284,6 +288,56 @@ emulator().catch(function(error) {
     }
   }
 
+  private toggleMapData() {
+    if (this.isMapDataVisible) {
+      this.removeMapData();
+    } else {
+      this.drawMapData();
+    }
+
+    this.isMapDataVisible = !this.isMapDataVisible;
+  }
+
+  private drawMapData() {
+    if (this.mapDataGrid.size === 0) {
+      for (let x = 0; x <= 9; x++) {
+        this.mapDataGrid.set(x, new Map());
+
+        for (let y = 0; y <= 9; y++) {
+          const mapData = this.emulation.colorMapData[x][y];
+
+          const buttonText = new PIXI.Text(mapData,
+          {
+              fontFamily : 'Arial',
+              fontSize: 20,
+              fill : 'black',
+              align : 'center'
+          });
+
+          buttonText.anchor.set(0.5, 0.5);
+          buttonText.position.set(x * 64 + 32, y * 64 + 32);
+
+          this.app.stage.addChild(buttonText);
+          this.mapDataGrid.get(x).set(y, buttonText);
+        }
+      }
+    } else {
+      for (let x = 0; x <= 9; x++) {
+        for (let y = 0; y <= 9; y++) {
+          this.app.stage.addChild(this.mapDataGrid.get(x).get(y));
+        }
+      }
+    }
+  }
+
+  private removeMapData() {
+    for (let x = 0; x <= 9; x++) {
+      for (let y = 0; y <= 9; y++) {
+        this.app.stage.removeChild(this.mapDataGrid.get(x).get(y));
+      }
+    }
+  }
+
   public removeSensorRead() {
     this.app.stage.removeChild(this.graphics);
 
@@ -316,16 +370,27 @@ emulator().catch(function(error) {
     if (this.currentTask === 1) {
       this.currentTask = 2;
 
-      this.taskDoneText = 'Fertig';
+      this.taskDoneText = 'nächste Aufgabe';
       this.taskText = `<p>In der zweite Aufgabe geht es darum, die Steuerung unseres Roboters
       <i>Wats<font color="#cc0000">3</font>n</i> zu testen.</p>
       <p>Um die Aufgabe erfolgreich abzuschließen, fahre bitte mit <i>Wats<font color="#cc0000">3</font>n</i>
       <strong>ein Quadrat</strong>. Der Roboter soll nach Abschluss des Quadrats wieder auf der Ausgangsposition stehen.
       Wie groß das Quadrat ist und in welche Richtung du fährst, bleibt dir überlassen.</p>
-      <p>Wenn du fertig bist oder nicht weiter kommst, klicke bitte auf die Schaltfläche <strong>Fertig</strong>.</p>`;
+      <p>Wenn du fertig bist oder nicht weiter kommst, klicke bitte auf die Schaltfläche <strong>nächste Aufgabe</strong>.</p>`;
 
     } else if (this.currentTask === 2) {
-      alert('alles fertig, hurra!');
+      this.currentTask = 3;
+
+      this.taskDoneText = 'Fertig';
+      this.taskText = `<p>In der dritten Aufgabe geht es darum, unseren Roboter
+      <i>Wats<font color="#cc0000">3</font>n</i> nur auf dem sicheren Felsenuntergrund fahren zu lassen.</p>
+      <p>Um die Aufgabe erfolgreich abzuschließen, erstelle bitte ein Programm, das <i>Wats<font color="#cc0000">3</font>n</i>
+      auf steinigem Untergrund fahren und bei der Graskante umdrehen lässt. Das Programm kann unendlich laufen oder nach einer Zeit
+      abbrechen. Die Entscheidung liegt bei dir.
+      <p>Wenn du fertig bist oder nicht weiter kommst, klicke bitte auf die Schaltfläche <strong>Fertig</strong>.</p>`;
+
+      } else if (this.currentTask === 3) {
+        alert('alles fertig, hurra!');
     }
   }
 
